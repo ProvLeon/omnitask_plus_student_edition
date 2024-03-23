@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .dark-mode {
+    @apply dark:bg-gray-800 dark:text-white;
+  }
+  .light-mode {
+    @apply bg-white text-gray-800;
+  }
+
+}
+
+* {
+  transition: color 0.5s, background-color 0.5s;
+}/* :root[data-theme="dark"] {
+  --text-color: #ffffff;
+  --background-color: #1a202c;
+  --link-color: #9f7aea;
+  --link-hover-color: #d6bcfa;
+} */
