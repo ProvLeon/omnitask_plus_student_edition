@@ -3,8 +3,13 @@ from database import session
 from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from models.schemas import UserSchema
 
 bp = Blueprint('user_routes', __name__, url_prefix='/users')
+
+
 
 def check_missing_fields(user_data):
     non_nullable_fields = ['username', 'firstname', 'lastname', 'email', 'contact', 'password']
@@ -34,7 +39,12 @@ def check_existing_user(user_data):
 @bp.route('/', methods=['POST'])
 def create_user():
     try:
-        user_data = request.json
+        user_schema = UserSchema()
+        errors = user_schema.validate(request.json)
+        if errors:
+            return jsonify({"error": errors}), 400
+
+        user_data = user_schema.load(request.json)
         missing_fields = check_missing_fields(user_data)
         if missing_fields:
             return jsonify({"error": f"Missing fields: {', '.join(missing_fields)}"}), 400

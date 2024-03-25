@@ -9,6 +9,10 @@ session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=en
 
 Base.query = session.query_property()
 
+
 def init_db():
-    import models
+    from models import user, task, study_session
+    _ = user.User.__tablename__
+    _ = task.Task.__tablename__
+    _ = study_session.StudySession.__tablename__
     Base.metadata.create_all(bind=engine)

@@ -2,8 +2,8 @@ from sqlalchemy import Column, Integer, String, DateTime, LargeBinary, Boolean, 
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from .base_model import Base, BaseModel
-from utils.json_utils import to_dict
-from flask import jsonify
+# from models import to_dict
+# from flask import jsonify
 
 
 # Base = declarative_base()

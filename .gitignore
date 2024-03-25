@@ -147,6 +147,9 @@ omnitask_plus_backend/*.sage.py
 # Environments
 omnitask_plus_backend/.env
 omnitask_plus_backend/.venv
+omnitask_plus_backend/bin
+omnitask_plus_backend/lib
+omnitask_plus_backend/include
 omnitask_plus_backend/env/
 omnitask_plus_backend/venv/
 omnitask_plus_backend/ENV/
