@@ -1,10 +1,10 @@
 from .user import User
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from .basemodel import Base
+from .base_model import Base, BaseModel
 from datetime import datetime
 
-class StudySession(Base):
+class StudySession(BaseModel, Base):
     __tablename__ = 'study_sessions'
     # id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)

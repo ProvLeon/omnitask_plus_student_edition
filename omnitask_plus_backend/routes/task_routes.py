@@ -2,9 +2,11 @@ from flask import Blueprint, request, jsonify
 from database import session
 from models.task import Task
 from sqlalchemy.exc import SQLAlchemyError
-from routes import id_type
+from utils.json_utils import to_dict
 
-bp = Blueprint('task_routes', __name__, url_prefix='/tasks', url_defaults={'endpoint_type': id_type})
+# from models import id_type
+
+bp = Blueprint('task_routes', __name__, url_prefix='/tasks')
 
 # Create a new task
 @bp.route('/', methods=['POST'])
@@ -26,7 +28,7 @@ def get_tasks():
     return jsonify([task.to_dict() for task in tasks]), 200
 
 # Get a single task by ID
-@bp.route('/<{endpoint_type}:task_id>', methods=['GET'])
+@bp.route('/<task_id>', methods=['GET'])
 def get_task(task_id):
     task = session.query(Task).filter(Task.id == task_id).first()
     if task:
@@ -35,7 +37,7 @@ def get_task(task_id):
         return jsonify(error="Task not found"), 404
 
 # Update a task
-@bp.route('/<{endpoint_type}:task_id>', methods=['PUT'])
+@bp.route('/<task_id>', methods=['PUT'])
 def update_task(task_id):
     task = session.query(Task).filter(Task.id == task_id).first()
     if task:
@@ -51,7 +53,7 @@ def update_task(task_id):
         return jsonify(error="Task not found"), 404
 
 # Delete a task
-@bp.route('/<{endpoint_type}:task_id>', methods=['DELETE'])
+@bp.route('/<task_id>', methods=['DELETE'])
 def delete_task(task_id):
     task = session.query(Task).filter(Task.id == task_id).first()
     if task:

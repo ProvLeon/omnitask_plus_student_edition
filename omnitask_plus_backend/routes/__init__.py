@@ -1,3 +1,2 @@
-from . import user_routes, task_routes, study_session_routes
+from . import user_routes, task_routes, study_sessions_routes
 
-id_type = 'uuid'

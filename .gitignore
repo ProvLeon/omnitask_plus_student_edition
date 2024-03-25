@@ -3,6 +3,7 @@
 omnitask_plus_frontend/tsconfig.*
 omnitask_plus_frontend/tsconfig.node.json
 omnitask_plus_frontend/Data.json
+omnitask_plus_frontend/firebase.js
 
 
 # Logs
@@ -96,6 +97,7 @@ omnitask_plus_backend/*.pot
 omnitask_plus_backend/*.log
 omnitask_plus_backend/local_settings.py
 omnitask_plus_backend/db.sqlite3
+omnitask_plus_backend/*.db
 omnitask_plus_backend/db.sqlite3-journal
 
 # Flask stuff:

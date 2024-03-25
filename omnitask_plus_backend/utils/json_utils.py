@@ -1,14 +1,11 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from models.basemodel import Base
+from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URI = 'sqlite:///omnitask_plus.db'
+Base = declarative_base()
 
-engine = create_engine(DATABASE_URI, echo=True)
-session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+def to_dict(model_instance, query_instance=None):
+    if hasattr(model_instance, "__table__"):
+        return {c.name: getattr(model_instance, c.name) for c in model_instance.__table__.columns}
+    else:
+        cols = query_instance.column_descriptions
+        return {cols[i]['name']: model_instance[i] for i in range(len(cols))}
 
-Base.query = session.query_property()
-
-def init_db():
-    import models
-    Base.metadata.create_all(bind=engine)

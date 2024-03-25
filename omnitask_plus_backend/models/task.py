@@ -2,9 +2,9 @@ from .user import User  # Import the User model
 
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, LargeBinary
 from sqlalchemy.orm import relationship
-from .basemodel import Base
+from .base_model import Base, BaseModel
 
-class Task(Base):
+class Task(BaseModel,Base):
     __tablename__ = 'tasks'
     # id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)

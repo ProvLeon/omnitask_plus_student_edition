@@ -2,9 +2,11 @@ from flask import Blueprint, request, jsonify
 from database import session
 from models.study_session import StudySession
 from sqlalchemy.exc import SQLAlchemyError
-from routes import id_type
+from utils.json_utils import to_dict
 
-bp = Blueprint('study_session_routes', __name__, url_prefix='/study_sessions', url_defaults={'endpoint_type': id_type})
+# from models import id_type
+
+bp = Blueprint('study_sessions_routes', __name__, url_prefix='/study_sessions')
 
 # Create a new study session
 @bp.route('/', methods=['POST'])
@@ -26,7 +28,7 @@ def get_study_sessions():
     return jsonify([study_session.to_dict() for study_session in study_sessions]), 200
 
 # Get a single study session by ID
-@bp.route('/<{endpoint_type}:study_session_id>', methods=['GET'])
+@bp.route('/<study_session_id>', methods=['GET'])
 def get_study_session(study_session_id):
     study_session = session.query(StudySession).filter(StudySession.id == study_session_id).first()
     if study_session:
@@ -35,7 +37,7 @@ def get_study_session(study_session_id):
         return jsonify(error="Study session not found"), 404
 
 # Update a study session
-@bp.route('/<{endpoint_type}:study_session_id>', methods=['PUT'])
+@bp.route('/<study_session_id>', methods=['PUT'])
 def update_study_session(study_session_id):
     study_session = session.query(StudySession).filter(StudySession.id == study_session_id).first()
     if study_session:
@@ -51,7 +53,7 @@ def update_study_session(study_session_id):
         return jsonify(error="Study session not found"), 404
 
 # Delete a study session
-@bp.route('/<{endpoint_type}:study_session_id>', methods=['DELETE'])
+@bp.route('/<study_session_id>', methods=['DELETE'])
 def delete_study_session(study_session_id):
     study_session = session.query(StudySession).filter(StudySession.id == study_session_id).first()
     if study_session:
