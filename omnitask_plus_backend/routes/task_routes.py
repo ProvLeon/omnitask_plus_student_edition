@@ -3,12 +3,22 @@ from database import session
 from models.task import Task
 from models.base_model import time_format
 from sqlalchemy.exc import SQLAlchemyError
-from utils.json_utils import to_dict
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
-import base64
+from werkzeug.utils import secure_filename
+import os
+
 
 bp = Blueprint('task_routes', __name__, url_prefix='/tasks')
+
+UPLOAD_FOLDER = '/uploads'
+DOCS_FOLDER = '/uploads/docs'
+IMAGES_FOLDER = '/uploads/images'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+BASE_URL = 'http://localhost:5000'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Create a new task
 @bp.route('/', methods=['POST'])
@@ -16,29 +26,50 @@ bp = Blueprint('task_routes', __name__, url_prefix='/tasks')
 def create_task():
     try:
         current_user_id = get_jwt_identity()  # Get the current user's ID from the JWT token
-        task_data = request.json
-        task_data['user_id'] = current_user_id  # Assign the current user's ID to the task
+        task_data = {}
 
-        # Convert deadline from string to datetime object
-        # if 'deadline' in task_data:
-        #     task_data['deadline'] = datetime.strptime(task_data['deadline'], time_format)
+        # Handle JSON content type
+        # if 'application/json' in request.content_type:
+        task_data = request.get_json()
 
-        if 'start_date' in task_data:
-            task_data['start_date'] = datetime.strptime(task_data['start_date'], time_format)
+        # Handle form data
+        # else:
+        #     task_data = request.form.to_dict()
 
-        if 'end_date' in task_data:
-            task_data['end_date'] = datetime.strptime(task_data['end_date'], time_format)
 
-        # Convert media from base64 string to bytes
-        if 'media' in task_data and task_data['media'] is not None:
-            task_data['media'] = base64.b64decode(task_data['media'])
+        # Handle file upload separately
+        # if 'media' in request.files:
+        #     file = request.files['media']
+        #     if file and allowed_file(file.filename):
+        #         extension = file.filename.rsplit('.', 1)[1].lower()
+        #         # Temporarily create a task instance to generate an ID for filename
+        #         temp_task = Task(user_id=current_user_id)
+        #         session.add(temp_task)
+        #         session.flush()  # This assigns an ID
+        #         filename = secure_filename(f"{temp_task.id}.{extension}")
+        #         file_path = os.path.join(DOCS_FOLDER if extension in ['txt', 'pdf'] else IMAGES_FOLDER, filename)
+        #         file.save(file_path)
+        #         task_data['media'] = f"{BASE_URL}{file_path}"
+        #         # Remove the temporary task instance if not needed
+        #         session.delete(temp_task)
 
+        # Ensure user_id is assigned
+        task_data['user_id'] = current_user_id
+
+        # Convert date strings to datetime objects
+        for field in ['start_date', 'end_date']:
+            if field in task_data:
+                task_data[field] = datetime.strptime(task_data[field], time_format)
+
+        print(task_data)
+        # Create and save the task
         task = Task(**task_data)
         session.add(task)
         session.commit()
         return jsonify(task.to_dict()), 201
     except SQLAlchemyError as e:
         session.rollback()
+        print(str(e))  # Log the error for debugging
         return jsonify(error=str(e)), 400
 
 @bp.route('/', methods=['GET'])
@@ -67,8 +98,23 @@ def update_task(task_id):
     task = session.query(Task).filter(Task.id == task_id, Task.user_id == current_user_id).first()
     if task:
         try:
-            task_data = request.json
-            # Convert deadline from string to datetime object
+            if 'application/json' in request.content_type:
+                task_data = request.json
+            else:  # Handle form data
+                task_data = request.form.to_dict()
+                print(task_data)
+                if 'media' in request.files:
+                    file = request.files['media']
+                    if file and allowed_file(file.filename):
+                        extension = file.filename.rsplit('.', 1)[1].lower()
+                        filename = secure_filename(f"{task.id}.{extension}")
+                        if extension in ['txt', 'pdf']:
+                            file_path = os.path.join(DOCS_FOLDER, filename)
+                        else:
+                            file_path = os.path.join(IMAGES_FOLDER, filename)
+                        file.save(file_path)
+                        task_data['media'] = f"{BASE_URL}{file_path}"
+
             if 'deadline' in task_data:
                 task_data['deadline'] = datetime.strptime(task_data['deadline'], '%Y-%m-%dT%H:%M:%S')
 

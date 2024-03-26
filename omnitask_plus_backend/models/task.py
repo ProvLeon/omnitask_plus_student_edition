@@ -14,7 +14,7 @@ class Task(BaseModel,Base):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
     priority = Column(Enum("low", "medium", "high"), nullable=False)
-    status = Column(Enum("pending", "in progress", "completed"), nullable=False)
+    status = Column(Enum("todo", "in progress", "completed"), nullable=False)
     # created_at = Column(DateTime, nullable=False)
     # updated_at = Column(DateTime, nullable=False)
     media = Column(String)  # Modified field for storing Base64 encoded documents as per TaskApi.tsx

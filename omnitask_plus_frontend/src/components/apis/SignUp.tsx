@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios, { AxiosError } from 'axios'; // Add this import
 import { Button, TextField, Box, Grid, Paper, Typography, Container } from '@mui/material';
 
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL;
+
 interface ErrorResponse {
   error: string;
 }
+
 
 const SignUp = () => {
   const [userDetails, setUserDetails] = useState({
@@ -29,7 +32,7 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/users/', JSON.stringify(userDetails), {
+      await axios.post(`${BASE_URL}/api/users/create`, JSON.stringify(userDetails), {
         headers: {
           'Content-Type': 'application/json',
         },

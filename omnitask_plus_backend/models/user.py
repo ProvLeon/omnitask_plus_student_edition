@@ -20,7 +20,7 @@ class User(BaseModel, Base):
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
-    image = Column(LargeBinary)  # Column for storing images
+    image = Column(String)  # Column for storing images
     is_active = Column(Boolean, default=True)
 
     __table_args__ = (UniqueConstraint('email', name='uix_1'),)  # Ensure email uniqueness at the database level

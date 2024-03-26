@@ -3,7 +3,8 @@ import { Navigate } from 'react-router-dom';
 import axios from 'axios'; // Assuming axios is used for HTTP requests
 
 
-const BASE_URL = "http://localhost:5000"
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL
+
 const isAuthenticated = async () => {
   const token = localStorage.getItem('accessToken');
   if (!token) return false;
@@ -14,7 +15,7 @@ const isAuthenticated = async () => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log(token)
+    // console.log(token)
     return response.data.isValid;
   } catch (error) {
     console.error('Token validation error:', error);

@@ -14,8 +14,8 @@ const loginUser = async (credentials: { username: string; password: string }) =>
     const { access_token, refresh_token } = response.data;
     localStorage.setItem('accessToken', access_token);
     localStorage.setItem('refreshToken', refresh_token);
-    console.log("Access Token:", access_token);
-    console.log("Refresh Token:", refresh_token);
+    // console.log("Access Token:", access_token);
+    // console.log("Refresh Token:", refresh_token);
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);

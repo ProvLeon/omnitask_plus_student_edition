@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-// import { Icon } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
 import { MaterialUISwitch } from './MUI';
-import { NotificationsOutlined } from '@mui/icons-material';
+import { NotificationsOutlined, Close } from '@mui/icons-material'; // Added Close icon import
+import Profile from './SmallComponents/Profile';
 
 const Header = () => {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');
+  const [showProfile, setShowProfile] = useState(false);
+  const profileRef = useRef(null);
+
   const storedTheme = localStorage.getItem('theme');
   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -14,7 +17,6 @@ const Header = () => {
 
     document.documentElement.classList.add(`${selectedTheme}`);
     setTheme(selectedTheme);
-    // localStorage.setItem('theme', selectedTheme);
   }, []);
 
   const toggleTheme = () => {
@@ -43,30 +45,52 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleProfileClick = () => {
+    setShowProfile(!showProfile);
+    document.body.style.overflow = showProfile ? 'auto' : 'hidden';
+    document.body.style.height = showProfile ? 'auto' : '100vh';
+    document.body.style.background = showProfile ? 'none' : 'rgba(0, 0, 0, 0.5)';
+  };
+
+  const handleCloseProfile = () => {
+    setShowProfile(false);
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    document.body.style.background = 'none';
+  };
+
   return (
-    <header className="bg-transparent backdrop-filter backdrop-blur-sm border-b border-gray-400 dark:border-gray-700">
-      <nav className="container mx-auto flex justify-between items-center py-4">
-        <div className="flex items-center">
-          <Link to="/main" className="text-xl font-bold text-gray-800 dark:text-white">OmniTask+</Link>
-          <div className="ml-10 space-x-4">
-            <Link to="/boards" className="text-gray-800 dark:text-white">Boards</Link>
-            <Link to="/tasks" className="text-gray-800 dark:text-white">Tasks</Link>
-            <Link to="/chat" className="text-gray-800 dark:text-white">Chat</Link>
+    <>
+      <header className="bg-transparent backdrop-filter backdrop-blur-sm border-b border-gray-400 dark:border-gray-700">
+        <nav className="container mx-auto flex justify-between items-center py-4">
+          <div className="flex items-center">
+            <Link to="/main" className="text-xl font-bold text-gray-800 dark:text-white">OmniTask+</Link>
+            <div className="ml-10 space-x-4">
+              <Link to="/boards" className="text-gray-800 dark:text-white">Boards</Link>
+              <Link to="/tasks" className="text-gray-800 dark:text-white">Tasks</Link>
+              <Link to="/chat" className="text-gray-800 dark:text-white">Chat</Link>
+            </div>
           </div>
+          <div className="flex items-center">
+              <MaterialUISwitch onClick={toggleTheme} className='mr-4'/>
+            <div className="relative mr-4 cursor-pointer">
+              <span className="absolute right-0 top-0 rounded-[100px] w-4 h-4 text-center bg-red-500 text-white text-xs">3</span>
+              <NotificationsOutlined className=' text-gray-800 dark:text-white w-10 h-10'/>
+            </div>
+            <div id="profile" className="flex items-center cursor-pointer" onClick={handleProfileClick} ref={profileRef}>
+              <img src="https://images.unsplash.com/photo-1531727991582-cfd25ce79613?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Profile" className="w-8 h-8 rounded-full mr-2"/>
+              <span className="text-sm text-gray-800 dark:text-white">ProvLeon</span>
+            </div>
+          </div>
+        </nav>
+      </header>
+      {showProfile && <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg">
+          <button onClick={handleCloseProfile} className="absolute top-0 right-0 m-2 text-gray-800 dark:text-white">Close</button>
+          <Profile />
         </div>
-        <div className="flex items-center">
-            <MaterialUISwitch onClick={toggleTheme} className='mr-4'/>
-          <div className="relative mr-4 cursor-pointer">
-            <span className="absolute right-0 top-0 rounded-[100px] w-4 h-4 text-center bg-red-500 text-white text-xs">3</span>
-            <NotificationsOutlined className=' text-gray-800 dark:text-white w-10 h-10'/>
-          </div>
-          <div className="flex items-center cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1531727991582-cfd25ce79613?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Profile" className="w-8 h-8 rounded-full mr-2"/>
-            <span className="text-sm text-gray-800 dark:text-white">ProvLeon</span>
-          </div>
-        </div>
-      </nav>
-    </header>
+      </div>}
+    </>
   )
 }
 

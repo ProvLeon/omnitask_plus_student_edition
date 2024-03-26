@@ -10,7 +10,7 @@ import binascii  # Add this import at the top of your file
 
 Base = declarative_base()
 
-time_format = "%Y-%m-%d"
+time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 class BaseModel(Base):
     __abstract__ = True  # Declares this as a Base class for other models to inherit from
@@ -48,14 +48,12 @@ class BaseModel(Base):
         for c in inspect(self).mapper.column_attrs:
             value = getattr(self, c.key)
             # If the value is bytes, encode it to base64 string
-            if isinstance(value, bytes):
-                padding = 4 - (len(value) % 4)
-                value += "=" * padding
-                try:
-                    value = base64.b64encode(value).decode('utf-8')
-                except binascii.Error as e:
-                    # Handle decoding errors or return a specific error message
-                    print(f"Error decoding base64 string: {e}")
-                    value = None
+            # if isinstance(value, bytes):
+            #     try:
+            #         value = base64.b64encode(value).decode('utf-8')
+            #     except binascii.Error as e:
+            #         # Handle decoding errors or return a specific error message
+            #         print(f"Error encoding base64 string: {e}")
+            #         value = None
             model_dict[c.key] = value
         return model_dict

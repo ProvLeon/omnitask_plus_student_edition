@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/tasks';
+// Utilize environment variable for BASE_URL
+// Fix: Directly access environment variables using import.meta.env
+const BASE_URL = import.meta.env.REACT_APP_BASE_URL + '/tasks';
 
 // Function to get the authorization token
-const getAuthToken = () => {
+const getAuthToken = (): string | null => {
   const token = localStorage.getItem('accessToken');
   return token;
 };
@@ -12,7 +14,7 @@ const getAuthToken = () => {
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', // Updated to handle JSON data
   },
 });
 
@@ -27,40 +29,64 @@ axiosInstance.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+// Helper function to convert Base64 to File
+const base64ToFile = (base64: string, filename: string): File => {
+  const arr = base64.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  if (!mimeMatch) throw new Error('MIME type could not be determined from base64 string');
+  const mime = mimeMatch[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+};
+
 // API call to fetch tasks
-const getTasks = async () => {
+const getTasks = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get('/');
-    return response.data;
+    const tasks = response.data.map((task: any) => {
+      if (task.media) {
+        const filename = `${task.id}.${task.media.split('.').pop()}`; // Extract extension and prepend task ID
+        task.media = base64ToFile(task.media, filename);
+      }
+      return task;
+    });
+    return tasks;
   } catch (error) {
     throw error;
   }
 };
-
-// Function to convert file to Base64
-const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result as string);
-  reader.onerror = error => reject(error);
-});
 
 interface TaskData {
   [key: string]: any; // Allows any property with string key
-  media?: string; // Changed type to string to store Base64 encoded string
+  media?: File | null; // Media must be sent as a File
 }
 
-// Additional API calls based on task_routes.py and TaskForm.tsx
-const createTask = async (taskData: TaskData) => {
+// Helper function to convert file to Base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
+
+const createTask = async (taskData: TaskData): Promise<any> => {
+  if (taskData.media && (taskData.media instanceof File)) {
+    (taskData as any).media = await fileToBase64(taskData.media as File);
+  }
+
   try {
-    // Check if taskData contains a file for media and convert it to Base64
-    if (taskData['media'] && (taskData['media'] as any) instanceof File) {
-      const mediaBase64 = await toBase64(taskData['media'] as unknown as File);
-      taskData['media'] = mediaBase64;
-    }
     const response = await axiosInstance.post('/', taskData, {
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`,
       },
     });
     return response.data;
@@ -69,16 +95,15 @@ const createTask = async (taskData: TaskData) => {
   }
 };
 
-const updateTask = async (taskId: string, taskData: TaskData) => {
+const updateTask = async (taskId: string, taskData: TaskData): Promise<any> => {
+  if (taskData.media && (taskData.media instanceof File)) {
+    (taskData as any).media = await fileToBase64(taskData.media as File);
+  }
+
   try {
-    // Check if taskData contains a file for media and convert it to Base64
-    if (taskData['media'] && (taskData['media'] as any) instanceof File) {
-      const mediaBase64 = await toBase64(taskData['media'] as unknown as File);
-      taskData['media'] = mediaBase64;
-    }
     const response = await axiosInstance.put(`/${taskId}`, taskData, {
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`,
       },
     });
     return response.data;
@@ -87,13 +112,17 @@ const updateTask = async (taskId: string, taskData: TaskData) => {
   }
 };
 
-const deleteTask = async (taskId: string) => {
+const deleteTask = async (taskId: string): Promise<any> => {
   try {
-    const response = await axiosInstance.delete(`/${taskId}`);
+    const response = await axiosInstance.delete(`/${taskId}`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export { getTasks, createTask, updateTask, deleteTask };
+export { getTasks, createTask, updateTask, deleteTask, fileToBase64, base64ToFile };

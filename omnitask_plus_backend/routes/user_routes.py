@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 from models.schemas import UserSchema
 
-bp = Blueprint('user_routes', __name__, url_prefix='/users')
+bp = Blueprint('user_routes', __name__, url_prefix='/api/users')
 
 
 
@@ -35,7 +35,7 @@ def check_existing_user(user_data):
     return None, None
 
 # Create a new user
-@bp.route('/', methods=['POST'])
+@bp.route('/create', methods=['POST'])
 def create_user():
     try:
         user_schema = UserSchema()
@@ -63,7 +63,7 @@ def create_user():
         return jsonify(error=str(e)), 400
 
 # Get all users
-@bp.route('/', methods=['GET'])
+@bp.route('/getusers', methods=['GET'])
 def get_users():
     try:
         users = session.query(User).all()
@@ -73,7 +73,7 @@ def get_users():
         return jsonify(error=str(e)), 400
 
 # Get a single user by ID
-@bp.route('/<user_id>', methods=['GET'])
+@bp.route('/getuser/<user_id>', methods=['GET'])
 def get_user(user_id):
     try:
         user_id_uuid = UUID(user_id)
@@ -86,7 +86,7 @@ def get_user(user_id):
         return jsonify(error="Invalid UUID format"), 400
 
 # Update a user
-@bp.route('/<user_id>', methods=['PUT'])
+@bp.route('/update/<user_id>', methods=['PUT'])
 def update_user(user_id):
     try:
         user_id_uuid = UUID(user_id)
@@ -102,7 +102,7 @@ def update_user(user_id):
         return jsonify(error="Invalid UUID format"), 400
 
 # Delete a user
-@bp.route('/<user_id>', methods=['DELETE'])
+@bp.route('/delete/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
     try:
         user_id_uuid = UUID(user_id)

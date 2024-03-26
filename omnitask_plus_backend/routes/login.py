@@ -36,7 +36,7 @@ def login_user():
         if user and user.verify_password(login_data['password']):
             access_token = create_access_token(identity=str(user.id))
             refresh_token = create_refresh_token(identity=str(user.id))
-            return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+            return jsonify(access_token=access_token, refresh_token=refresh_token, user_id=user.id), 200
         else:
             return jsonify({"error": "Invalid username or password"}), 401
     except Exception as e:
