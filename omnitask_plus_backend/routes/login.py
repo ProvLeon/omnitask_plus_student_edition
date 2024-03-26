@@ -1,15 +1,14 @@
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request, current_app, jsonify
 from database import session  # Adjust the import path according to your project structure
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask import jsonify
 from models import User
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, verify_jwt_in_request
 from marshmallow import Schema, fields, validate
 
 # from app import app  # This line should be removed
 
-bp = Blueprint('login', __name__, url_prefix='/login')
+bp = Blueprint('login', __name__, url_prefix='/api/')
 
 
 
@@ -23,7 +22,7 @@ class UserSchema(Schema):
     password = fields.Str(required=True, validate=validate.Length(min=6))
 
 # Apply rate limiting to the login route
-@bp.route('/', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login_user():
     try:
@@ -50,3 +49,13 @@ def refresh():
     current_user_id = get_jwt_identity()
     new_token = create_access_token(identity=current_user_id)
     return jsonify(access_token=new_token), 200
+
+
+@bp.route('/validatetoken', methods=['POST'])
+def validate_token():
+    try:
+        verify_jwt_in_request()
+        return jsonify({"isValid": True}), 200
+    except Exception as e:
+        current_app.logger.error(f"Token validation error: {e}")
+        return jsonify({"isValid": False}), 401

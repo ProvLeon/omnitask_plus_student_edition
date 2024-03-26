@@ -3,8 +3,6 @@ from database import session
 from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from models.schemas import UserSchema
 
 bp = Blueprint('user_routes', __name__, url_prefix='/users')
@@ -21,6 +19,7 @@ def normalize_user_data(user_data):
     user_data['firstname'] = user_data['firstname'].capitalize()
     user_data['lastname'] = user_data['lastname'].capitalize()
     user_data['middlename'] = user_data['middlename'].capitalize() if user_data.get('middlename') else ''
+    user_data['contact'] = str(user_data['contact']).replace(' ', '') if user_data.get('contact') else ''
     return user_data
 
 def check_existing_user(user_data):

@@ -5,10 +5,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.inspection import inspect
 from datetime import datetime
 import uuid
+import base64
+import binascii  # Add this import at the top of your file
 
 Base = declarative_base()
 
-time = "%Y-%m-%dT%H:%M:%S.%f"
+time_format = "%Y-%m-%d"
 
 class BaseModel(Base):
     __abstract__ = True  # Declares this as a Base class for other models to inherit from
@@ -24,11 +26,11 @@ class BaseModel(Base):
                 if key != "__class__":
                     setattr(self, key, value)
             if kwargs.get("created_at", None) and isinstance(self.created_at, str):
-                self.created_at = datetime.strptime(kwargs["created_at"], time)
+                self.created_at = datetime.strptime(kwargs["created_at"], time_format)
             else:
                 self.created_at = datetime.utcnow()
             if kwargs.get("updated_at", None) and isinstance(self.updated_at, str):
-                self.updated_at = datetime.strptime(kwargs["updated_at"], time)
+                self.updated_at = datetime.strptime(kwargs["updated_at"], time_format)
             else:
                 self.updated_at = datetime.utcnow()
 
@@ -41,6 +43,19 @@ class BaseModel(Base):
             self.updated_at = self.created_at
 
     def to_dict(self):
-        """Return a dictionary representation of the user model."""
-        return {c.key: getattr(self, c.key)
-                for c in inspect(self).mapper.column_attrs}
+        """Return a dictionary representation of the model, encoding bytes fields to base64."""
+        model_dict = {}
+        for c in inspect(self).mapper.column_attrs:
+            value = getattr(self, c.key)
+            # If the value is bytes, encode it to base64 string
+            if isinstance(value, bytes):
+                padding = 4 - (len(value) % 4)
+                value += "=" * padding
+                try:
+                    value = base64.b64encode(value).decode('utf-8')
+                except binascii.Error as e:
+                    # Handle decoding errors or return a specific error message
+                    print(f"Error decoding base64 string: {e}")
+                    value = None
+            model_dict[c.key] = value
+        return model_dict

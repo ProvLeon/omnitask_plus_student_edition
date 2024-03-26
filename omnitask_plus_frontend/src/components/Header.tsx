@@ -47,7 +47,7 @@ const Header = () => {
     <header className="bg-transparent backdrop-filter backdrop-blur-sm border-b border-gray-400 dark:border-gray-700">
       <nav className="container mx-auto flex justify-between items-center py-4">
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold text-gray-800 dark:text-white">OmniTask+</Link>
+          <Link to="/main" className="text-xl font-bold text-gray-800 dark:text-white">OmniTask+</Link>
           <div className="ml-10 space-x-4">
             <Link to="/boards" className="text-gray-800 dark:text-white">Boards</Link>
             <Link to="/tasks" className="text-gray-800 dark:text-white">Tasks</Link>

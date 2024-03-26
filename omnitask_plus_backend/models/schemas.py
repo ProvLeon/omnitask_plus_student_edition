@@ -8,7 +8,7 @@ class UserSchema(Schema):
     email = fields.Email(required=True)
     contact = fields.Str(required=True)
     password = fields.Str(required=True, validate=validate.Length(min=6))
-    is_active = fields.Boolean(required=True)
+    is_active = fields.Boolean()
 
 class TaskSchema(Schema):
     pass

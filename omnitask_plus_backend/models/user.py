@@ -16,7 +16,7 @@ class User(BaseModel, Base):
     lastname = Column(String(50), nullable=False)
     middlename = Column(String(50), nullable=True)
     email = Column(String(100), nullable=False, unique=True)  # Adjusted to ensure email is unique
-    contact = Column(Integer, nullable=False)
+    contact = Column(String(20), nullable=False)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)

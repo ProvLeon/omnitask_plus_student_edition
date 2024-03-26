@@ -10,12 +10,14 @@ class Task(BaseModel,Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
-    deadline = Column(DateTime, nullable=False)
+    # deadline = Column(DateTime, nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
     priority = Column(Enum("low", "medium", "high"), nullable=False)
     status = Column(Enum("pending", "in progress", "completed"), nullable=False)
     # created_at = Column(DateTime, nullable=False)
     # updated_at = Column(DateTime, nullable=False)
-    media = Column(LargeBinary)  # Added field for storing documents
+    media = Column(String)  # Modified field for storing Base64 encoded documents as per TaskApi.tsx
 
     user = relationship("User", back_populates="tasks")
 
