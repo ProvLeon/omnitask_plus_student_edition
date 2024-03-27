@@ -18,8 +18,8 @@ class User(BaseModel, Base):
     email = Column(String(100), nullable=False, unique=True)  # Adjusted to ensure email is unique
     contact = Column(String(20), nullable=False)
     password_hash = Column(String(255), nullable=False)
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
+    # created_at = Column(DateTime)
+    # updated_at = Column(DateTime)
     image = Column(String)  # Column for storing images
     is_active = Column(Boolean, default=True)
 

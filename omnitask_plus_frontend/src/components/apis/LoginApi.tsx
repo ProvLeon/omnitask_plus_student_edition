@@ -1,19 +1,20 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_REACT_APP_BASE_URL +'/api'
 
 // Function to login and receive access and refresh tokens
 const loginUser = async (credentials: { username: string; password: string }) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/login`, JSON.stringify(credentials), {
+    const response = await axios.post(`${BASE_URL}/login`, JSON.stringify(credentials), {
       headers: {
         'Content-Type': 'application/json',
       },
     });
     // Assuming the response includes both accessToken and refreshToken
-    const { access_token, refresh_token } = response.data;
+    const { access_token, refresh_token, user_id } = response.data;
     localStorage.setItem('accessToken', access_token);
     localStorage.setItem('refreshToken', refresh_token);
+    localStorage.setItem('userId', user_id)
     // console.log("Access Token:", access_token);
     // console.log("Refresh Token:", refresh_token);
     return response.data;

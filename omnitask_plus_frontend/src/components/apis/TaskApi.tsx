@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Utilize environment variable for BASE_URL
 // Fix: Directly access environment variables using import.meta.env
-const BASE_URL = import.meta.env.REACT_APP_BASE_URL + '/tasks';
+const BASE_URL = import.meta.env.VITE_REACT_APP_BASE_URL + '/tasks';
 
 // Function to get the authorization token
 const getAuthToken = (): string | null => {

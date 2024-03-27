@@ -86,7 +86,9 @@ const Header = () => {
       </header>
       {showProfile && <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg">
-          <button onClick={handleCloseProfile} className="absolute top-0 right-0 m-2 text-gray-800 dark:text-white">Close</button>
+          <button onClick={handleCloseProfile} className="absolute top-0 right-0 m-2 text-gray-800 dark:text-white">
+            <Close /> {/* Added Close icon for closing profile */}
+          </button>
           <Profile />
         </div>
       </div>}

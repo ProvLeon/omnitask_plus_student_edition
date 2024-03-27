@@ -47,13 +47,16 @@ class BaseModel(Base):
         model_dict = {}
         for c in inspect(self).mapper.column_attrs:
             value = getattr(self, c.key)
-            # If the value is bytes, encode it to base64 string
-            # if isinstance(value, bytes):
-            #     try:
-            #         value = base64.b64encode(value).decode('utf-8')
-            #     except binascii.Error as e:
-            #         # Handle decoding errors or return a specific error message
-            #         print(f"Error encoding base64 string: {e}")
-            #         value = None
             model_dict[c.key] = value
         return model_dict
+
+def to_base64(value):
+    if isinstance(value, bytes):
+        try:
+            image_data = value.split(',')[1]
+            return base64.b64encode(image_data), image_data
+        except binascii.Error as e:
+            print(f"Error encoding base64 string: {e}")
+            return None
+    else:
+        raise TypeError("Value must be bytes")

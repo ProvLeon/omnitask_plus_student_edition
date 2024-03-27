@@ -4,6 +4,9 @@ from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 from models.schemas import UserSchema
+import uuid
+from datetime import datetime
+from models.base_model import time_format, to_base64
 
 bp = Blueprint('user_routes', __name__, url_prefix='/api/users')
 
@@ -53,6 +56,13 @@ def create_user():
         if error_message:
             return jsonify({"error": error_message}), error_code
 
+        # Ensure UUID fields are correctly formatted
+        if 'id' in user_data:
+            try:
+                user_data['id'] = str(uuid.UUID(user_data['id']))
+            except ValueError:
+                return jsonify({"error": "Invalid UUID format for 'id'"}), 400
+
         user = User(**user_data)
         session.add(user)
         session.commit()
@@ -93,7 +103,15 @@ def update_user(user_id):
         user = session.query(User).filter(User.id == user_id_uuid).first()
         if user:
             for key, value in request.json.items():
-                setattr(user, key, value)
+                # Ensure UUID fields are correctly formatted
+                if key == 'id':
+                    try:
+                        value = str(uuid.UUID(value))
+                    except ValueError:
+                        return jsonify({"error": "Invalid UUID format for 'id'"}), 400
+                if key != 'created_at' and key != 'user_id':  # Exclude 'created_at' from being updated
+                    setattr(user, key, value)
+            user.updated_at = datetime.utcnow().strftime(time_format)  # Update 'updated_at' field
             session.commit()
             return jsonify(user.to_dict()), 200
         else:
@@ -115,4 +133,24 @@ def delete_user(user_id):
             return jsonify(error="User not found"), 404
     except ValueError:
         return jsonify(error="Invalid UUID format"), 400
+
+
+@bp.route('/update_user_image', methods=['POST'])
+def update_user_image():
+    user_id = request.json.get('user_id')
+    base64_image_string = request.json.get('image')
+
+    # Decode the base64 string to bytes
+    image_bytes, image_data = to_base64(base64_image_string)
+    print(image_data, image_bytes)
+    # image_bytes = base64.b64decode(image_data)
+
+    # Retrieve the user and update the image field
+    user = session.query(User).filter_by(id=user_id).first()
+    if user:
+        user.image = image_bytes
+        session.commit()
+        return jsonify({"message": "Image updated successfully"}), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
 
