@@ -3,7 +3,14 @@ import { Box, Typography, Button, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Player } from '@lottiefiles/react-lottie-player';
-import animationData from '../assets/animations/Animation-1711404365495.json'; // Changed from GIF to Lottie Animation using a different library
+import { Link as ScrollLink } from 'react-scroll'; // Import from react-scroll and rename to avoid conflict with react-router-dom's Link
+import animationData from '../../assets/animations/Animation-1711404365495.json';
+import Header from './Header';
+import IntroSection from './Intro';
+import FeaturesSection from './Features';
+import ContactSection from './Contact';
+import AboutSection from './About';
+import FooterSection from './FooterSection';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -23,6 +30,8 @@ const LandingPage = () => {
   };
 
   return (
+    <div>
+    <Header/>
     <Box
       sx={{
         flexGrow: 1,
@@ -32,7 +41,7 @@ const LandingPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >
+      >
       <Container maxWidth="lg">
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item xs={12} md={6}>
@@ -46,6 +55,11 @@ const LandingPage = () => {
               <Button variant="contained" color="primary" onClick={() => navigate('/signup')}>
                 Get Started
               </Button>
+              <ScrollLink to="features" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}>
+                <Button variant="outlined" color="primary" style={{ marginLeft: '8px' }}>
+                  Explore Features
+                </Button>
+              </ScrollLink>
             </Box>
           </Grid>
           <Grid item xs={12} md={6} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -54,7 +68,7 @@ const LandingPage = () => {
               animate="visible"
               variants={containerVariants}
               style={{ width: '400px', height: '400px' }}
-            >
+              >
               <Player
                 autoplay
                 loop
@@ -66,6 +80,15 @@ const LandingPage = () => {
         </Grid>
       </Container>
     </Box>
+    <div>
+      <ScrollLink to="intro" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><IntroSection id="intro" /></ScrollLink>
+      <ScrollLink to="features" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><FeaturesSection id="features" /></ScrollLink>
+      <ScrollLink to="contact" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><ContactSection id="contact" /></ScrollLink>
+      <ScrollLink to="about" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><AboutSection id="about" /></ScrollLink>
+      <FooterSection />
+    </div>
+    </div>
+
   );
 };
 

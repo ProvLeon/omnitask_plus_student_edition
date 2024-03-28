@@ -21,17 +21,17 @@
       "name": "Features",
       "content": [
         {
-          "image": "assets/images/task_management.png",
+          "image": "../../assets/images/task_management.png",
           "name": "Task Management",
           "description": "Create, assign, and track tasks with ease, ensuring you stay on top of your assignments."
         },
         {
-          "image": "assets/images/pomodoro_timer.png",
+          "image": "../../assets/images/pomodoro_timer.png",
           "name": "Pomodoro Timer",
           "description": "Built-in Pomodoro timer functionality helps you focus on your tasks and manage your time effectively."
         },
         {
-          "image": "assets/images/virtual_study_sessions.png",
+          "image": "../../assets/images/virtual_study_sessions.png",
           "name": "Virtual Study Sessions",
           "description": "Connect with peers for collaborative learning sessions, enhancing your study habits and productivity."
         }

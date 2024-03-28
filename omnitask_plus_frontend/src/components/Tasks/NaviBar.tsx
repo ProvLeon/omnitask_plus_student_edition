@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { MaterialUISwitch } from './MUI';
+import { MaterialUISwitch } from '../MUI';
 import { NotificationsOutlined, Close } from '@mui/icons-material'; // Added Close icon import
-import Profile from './SmallComponents/Profile';
+import Profile from '../SmallComponents/Profile';
 
 const Header = () => {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');

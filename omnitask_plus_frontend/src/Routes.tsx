@@ -5,7 +5,7 @@ import Boards from './pages/Boards';
 import Tasks from './pages/Tasks';
 import Chat from './pages/Chat';
 import SignUp from './components/apis/SignUp'; // Added import for SignUp
-import LandingPage from './pages/LandingPage'; // Added import for LandingPage
+import LandingPage from './pages/LandingPage/LandingPage'; // Added import for LandingPage
 import PassRecoveryPage from './pages/PassRecoveryPage';
 import NotFoundPage from './pages/404';
 import TaskForm from './components/Tasks/TaskForm';
