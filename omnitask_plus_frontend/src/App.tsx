@@ -1,15 +1,19 @@
-import React from "react";
-import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, useLocation, Navigate } from "react-router-dom";
 import RoutesComponent from "./Routes";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 
+
 const Layout = () => {
   const location = useLocation();
+
+
   // Always show the footer except on the LandingPage
   const showFooter = location.pathname !== "*";
   // Exclude the header on the SignUp, Login, and NotFoundPage
   const showHeader = !["/", "/signup", "/login", "/404"].includes(location.pathname);
+
 
   return (
     <>

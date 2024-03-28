@@ -44,10 +44,21 @@ const refreshAccessToken = async () => {
 
 // Axios interceptor to handle token refresh automatically
 axios.interceptors.response.use(response => response, async error => {
+  // Check if the current URL is the login, register, or forgot-password page
+  if (window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/forgot-password') {
+    // If on the login page, do not attempt to refresh the token
+    return Promise.reject(error);
+  }
+
   const originalRequest = error.config;
   if (error.response.status === 401 && !originalRequest._retry) {
     originalRequest._retry = true;
     const newAccessToken = await refreshAccessToken();
+    if (!newAccessToken) {
+      // Redirect to login if refresh token is invalid or expired
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
     axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
     originalRequest.headers['Content-Type'] = 'application/json'; // Ensure JSON content type is set for retry requests
     return axios(originalRequest);

@@ -156,6 +156,7 @@ omnitask_plus_backend/ENV/
 omnitask_plus_backend/env.bak/
 omnitask_plus_backend/venv.bak/
 omnitask_plus_backend/task.json
+omnitask_plus_backend/uploads/
 
 # Spyder project settings
 omnitask_plus_backend/.spyderproject

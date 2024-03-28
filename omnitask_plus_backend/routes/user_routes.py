@@ -4,9 +4,9 @@ from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 from models.schemas import UserSchema
-import uuid
 from datetime import datetime
-from models.base_model import time_format, to_base64
+from models.base_model import time_format, base64_to_file
+# import base64
 
 bp = Blueprint('user_routes', __name__, url_prefix='/api/users')
 
@@ -30,12 +30,12 @@ def check_existing_user(user_data):
     existing_username = session.query(User).filter(User.username == user_data['username']).first()
     if existing_email or existing_username:
         if existing_email and existing_username:
-            return "A user with the same email or username already exists", 409
-        if existing_email:
+            return "A user with the same email and username already exists", 409
+        elif existing_email:
             return f"Email {existing_email.email} already exists", 409
-        if existing_username:
+        elif existing_username:
             return f"Username {existing_username.username} already exists", 409
-    return None, None
+    return None, 200  # Explicitly return 200 OK if no error
 
 # Create a new user
 @bp.route('/create', methods=['POST'])
@@ -59,7 +59,7 @@ def create_user():
         # Ensure UUID fields are correctly formatted
         if 'id' in user_data:
             try:
-                user_data['id'] = str(uuid.UUID(user_data['id']))
+                user_data['id'] = str(UUID(user_data['id']))
             except ValueError:
                 return jsonify({"error": "Invalid UUID format for 'id'"}), 400
 
@@ -101,23 +101,25 @@ def update_user(user_id):
     try:
         user_id_uuid = UUID(user_id)
         user = session.query(User).filter(User.id == user_id_uuid).first()
-        if user:
-            for key, value in request.json.items():
-                # Ensure UUID fields are correctly formatted
-                if key == 'id':
-                    try:
-                        value = str(uuid.UUID(value))
-                    except ValueError:
-                        return jsonify({"error": "Invalid UUID format for 'id'"}), 400
-                if key != 'created_at' and key != 'user_id':  # Exclude 'created_at' from being updated
-                    setattr(user, key, value)
-            user.updated_at = datetime.utcnow().strftime(time_format)  # Update 'updated_at' field
-            session.commit()
-            return jsonify(user.to_dict()), 200
-        else:
+        if not user:
             return jsonify(error="User not found"), 404
-    except ValueError:
-        return jsonify(error="Invalid UUID format"), 400
+
+        user_data = request.json
+        for key, value in user_data.items():
+            if key == 'id':
+                continue  # Skip updating the 'id' field
+            if key == 'image':
+                value = base64_to_file(value, user_id_uuid)
+            setattr(user, key, value)
+        user.updated_at = datetime.utcnow().strftime(time_format)  # Update 'updated_at' field
+        session.commit()
+        return jsonify(user.to_dict()), 200
+    except SQLAlchemyError as e:
+        session.rollback()
+        app.logger.error(f"Failed to update user: {e} (user_id={user_id})")
+        return jsonify(error=str(e)), 400
+    except ValueError as ve:
+        return jsonify(error="Invalid UUID format " + str(ve)), 400
 
 # Delete a user
 @bp.route('/delete/<user_id>', methods=['DELETE'])
@@ -137,20 +139,15 @@ def delete_user(user_id):
 
 @bp.route('/update_user_image', methods=['POST'])
 def update_user_image():
-    user_id = request.json.get('user_id')
+    user_id = UUID(request.json.get('user_id'))
     base64_image_string = request.json.get('image')
 
-    # Decode the base64 string to bytes
-    image_bytes, image_data = to_base64(base64_image_string)
-    print(image_data, image_bytes)
-    # image_bytes = base64.b64decode(image_data)
+    image_url = base64_to_file(base64_image_string, user_id)
 
-    # Retrieve the user and update the image field
     user = session.query(User).filter_by(id=user_id).first()
     if user:
-        user.image = image_bytes
+        user.image = image_url
         session.commit()
         return jsonify({"message": "Image updated successfully"}), 200
     else:
         return jsonify({"error": "User not found"}), 404
-

@@ -9,6 +9,8 @@ from database import init_db
 def create_app():
     app = Flask(__name__)
 
+    app.config['BASE_URL'] = 'http://localhost:5000'
+
     # Generate a random secret key
     app.config['JWT_SECRET_KEY'] = os.urandom(24).hex()
     jwt = JWTManager(app)
@@ -25,10 +27,12 @@ def create_app():
     from routes.task_routes import bp as task_routes_bp
     from routes.study_sessions_routes import bp as study_sessions_routes_bp
     from routes.login import bp as login_bp
+    from routes.files_route import bp as files_route_bp
     app.register_blueprint(user_routes_bp)
     app.register_blueprint(task_routes_bp)
     app.register_blueprint(study_sessions_routes_bp)
     app.register_blueprint(login_bp)
+    app.register_blueprint(files_route_bp)
 
 
     return app

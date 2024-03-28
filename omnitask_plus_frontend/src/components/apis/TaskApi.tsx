@@ -30,31 +30,31 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 // Helper function to convert Base64 to File
-const base64ToFile = (base64: string, filename: string): File => {
-  const arr = base64.split(',');
-  const mimeMatch = arr[0].match(/:(.*?);/);
-  if (!mimeMatch) throw new Error('MIME type could not be determined from base64 string');
-  const mime = mimeMatch[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
+// const base64ToFile = (base64: string, filename: string): File => {
+//   const arr = base64.split(',');
+//   const mimeMatch = arr[0].match(/:(.*?);/);
+//   if (!mimeMatch) throw new Error('MIME type could not be determined from base64 string');
+//   const mime = mimeMatch[1];
+//   const bstr = atob(arr[1]);
+//   let n = bstr.length;
+//   const u8arr = new Uint8Array(n);
 
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
+//   while (n--) {
+//     u8arr[n] = bstr.charCodeAt(n);
+//   }
 
-  return new File([u8arr], filename, { type: mime });
-};
+//   return new File([u8arr], filename, { type: mime });
+// };
 
 // API call to fetch tasks
 const getTasks = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get('/');
     const tasks = response.data.map((task: any) => {
-      if (task.media) {
-        const filename = `${task.id}.${task.media.split('.').pop()}`; // Extract extension and prepend task ID
-        task.media = base64ToFile(task.media, filename);
-      }
+      // if (task.media) {
+      //   const filename = `${task.id}.${task.media.split('.').pop()}`; // Extract extension and prepend task ID
+      //   task.media = base64ToFile(task.media, filename);
+      // }
       return task;
     });
     return tasks;
@@ -125,4 +125,4 @@ const deleteTask = async (taskId: string): Promise<any> => {
   }
 };
 
-export { getTasks, createTask, updateTask, deleteTask, fileToBase64, base64ToFile };
+export { getTasks, createTask, updateTask, deleteTask, fileToBase64 };
