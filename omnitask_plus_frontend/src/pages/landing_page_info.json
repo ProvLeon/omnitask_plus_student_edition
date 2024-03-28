@@ -1,0 +1,72 @@
+{
+  "sections": [
+    {
+      "name": "Introduction",
+      "content": {
+        "coverImage": "assets/images/cover_image.jpg",
+        "projectName": "OmniTask+ Student Edition",
+        "description": "Elevate Your Productivity with Real-Time Communication, Smart Chat Algorithms, and Student-Focused Features.",
+        "navigationElements": [
+          {"name": "Features", "link": "/#Features"},
+          {"name": "About", "link": "/#About"},
+          {"name": "Contact", "link": "/contact"}
+        ],
+        "button": {
+          "label": "Try OmniTask+ Now",
+          "link": "/app"
+        }
+      }
+    },
+    {
+      "name": "Features",
+      "content": [
+        {
+          "image": "assets/images/task_management.png",
+          "name": "Task Management",
+          "description": "Create, assign, and track tasks with ease, ensuring you stay on top of your assignments."
+        },
+        {
+          "image": "assets/images/pomodoro_timer.png",
+          "name": "Pomodoro Timer",
+          "description": "Built-in Pomodoro timer functionality helps you focus on your tasks and manage your time effectively."
+        },
+        {
+          "image": "assets/images/virtual_study_sessions.png",
+          "name": "Virtual Study Sessions",
+          "description": "Connect with peers for collaborative learning sessions, enhancing your study habits and productivity."
+        }
+      ]
+    },
+    {
+      "name": "About",
+      "content": {
+        "inspiration": "The inspiration behind OmniTask+ stems from the challenges faced by students in managing their tasks and collaborating effectively, especially in remote learning environments. This project, a Portfolio Project for Holberton School, aims to address these challenges by providing a comprehensive solution.",
+        "teamMembers": [
+          {
+            "name": "Lomotey Okantah Emmanuel",
+            "LinkedIn": "https://www.linkedin.com/in/emmanuellomotey",
+            "GitHub": "https://github.com/ProvLeon",
+            "Twitter": "https://twitter.com/ProvLeon"
+          }
+        ],
+        "projectRepo": "https://github.com/ProvLeon/omnitask_plus_student_edition"
+      }
+    },
+    {
+      "name": "Contact",
+      "content": {
+        "description": "We'd love to hear from you! Whether you have a question about features, trials, need a demo, or anything else, our team is ready to answer all your questions.",
+        "email": "leotech.digital@gmail.com",
+        "socialMedia": [
+          {"platform": "LinkedIn", "link": "https://www.linkedin.com/in/emmanuellomotey"},
+          {"platform": "GitHub", "link": "https://github.com/ProvLeon"},
+          {"platform": "Twitter", "link": "https://twitter.com/ProvLeon"}
+        ]
+      }
+    }
+  ]
+}
+
+
+
+
