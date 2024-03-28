@@ -81,10 +81,10 @@ const LandingPage = () => {
       </Container>
     </Box>
     <div>
-      <ScrollLink to="intro" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><IntroSection id="intro" /></ScrollLink>
-      <ScrollLink to="features" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><FeaturesSection id="features" /></ScrollLink>
-      <ScrollLink to="contact" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><ContactSection id="contact" /></ScrollLink>
-      <ScrollLink to="about" smooth={true} duration={500} style={{ textDecoration: 'none' }} offset={-70}><AboutSection id="about" /></ScrollLink>
+      <IntroSection id="intro" />
+      <FeaturesSection id="features" />
+      <ContactSection id="contact" />
+      <AboutSection id="about" />
       <FooterSection />
     </div>
     </div>
