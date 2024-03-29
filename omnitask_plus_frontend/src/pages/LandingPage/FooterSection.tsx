@@ -1,5 +1,4 @@
-import React from 'react';
-import { Box, Container, Grid, Typography, IconButton, Link } from '@mui/material';
+import {  Container, Box, Grid, Typography, IconButton, Link } from '@mui/material';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import EmailIcon from '@mui/icons-material/Email';
@@ -12,7 +11,7 @@ const FooterBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(8, 0),
 }));
 
-const FooterLink = styled('div')(({ theme }) => ({
+const FooterLink = styled('div')(() => ({
   color: '#dfdfdf',
   cursor: 'pointer',
   textDecoration: 'none',

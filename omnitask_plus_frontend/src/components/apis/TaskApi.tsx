@@ -65,7 +65,7 @@ const getTasks = async (): Promise<any> => {
 
 interface TaskData {
   [key: string]: any; // Allows any property with string key
-  media?: File | null; // Media must be sent as a File
+  media?: File | string | null; // Media can be File, string, or null
 }
 
 // Helper function to convert file to Base64

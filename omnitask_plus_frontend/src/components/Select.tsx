@@ -4,10 +4,12 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-export default function Selector({ title, description, priority: initialPriority, progress, date }: { title: string, description: string, priority: string, progress: number, date: Date }) {
+export default function Selector({ priority: initialPriority }: { title: string, description: string, priority: string, progress: number, date: Date }) {
   const [priority, setPriority] = React.useState<string>(initialPriority);
 
-  const PriorityIcon = ({ level }: { level: string }) => {
+  priority
+
+    const PriorityIcon = ({ level }: { level: string }) => {
     let icons = [];
     switch (level) {
       case 'High':

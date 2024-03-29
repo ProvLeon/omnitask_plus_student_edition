@@ -85,9 +85,16 @@ const LoginPage = () => {
                     ),
                   }}
                 />
+
                 <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
                   Login
                 </Button>
+                <div className='flex gap-2'>
+                  <text className='p-2' >
+                    Forgotten Your Password?
+                  </text>
+                <Link className='text-blue-900 self-center' to="/passwordrecovery" >Click Here</Link>
+                </div>
               </form>
             </Paper>
           </Grid>

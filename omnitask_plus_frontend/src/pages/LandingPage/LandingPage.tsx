@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography, Button, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -18,15 +17,6 @@ const LandingPage = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { delay: 0.5, duration: 1.5 } },
-  };
-
-  const iconVariants = {
-    hidden: { scale: 0.95, y: 0 },
-    visible: {
-      scale: [0.95, 1.05, 0.95],
-      y: [0, -5, 0],
-      transition: { repeat: Infinity, ease: "linear", duration: 2 },
-    },
   };
 
   return (

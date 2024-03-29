@@ -1,27 +1,27 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { /*useState,*/ useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 
 const Header = () => {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');
+  // const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');
 
-  const storedTheme = localStorage.getItem('theme');
-  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // const storedTheme = localStorage.getItem('theme');
+  // const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  useEffect(() => {
-    const selectedTheme = storedTheme ? storedTheme : prefersDarkMode ? 'dark' : 'light';
+  // useEffect(() => {
+  //   const selectedTheme = storedTheme ? storedTheme : prefersDarkMode ? 'dark' : 'light';
 
-    document.documentElement.classList.add(`${selectedTheme}`);
-    setTheme(selectedTheme);
-  }, []);
+  //   document.documentElement.classList.add(`${selectedTheme}`);
+  //   setTheme(selectedTheme);
+  // }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.classList.add(`${newTheme}`);
-    document.documentElement.classList.remove(`${theme}`);
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
+  // const toggleTheme = () => {
+  //   const newTheme = theme === 'light' ? 'dark' : 'light';
+  //   document.documentElement.classList.add(`${newTheme}`);
+  //   document.documentElement.classList.remove(`${theme}`);
+  //   setTheme(newTheme);
+  //   localStorage.setItem('theme', newTheme);
+  // };
 
   useEffect(() => {
     const handleScroll = () => {

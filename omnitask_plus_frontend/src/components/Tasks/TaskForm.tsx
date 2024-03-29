@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, MenuItem, Select, InputLabel, FormControl, Grid } from '@mui/material';
+import { TextField, Button, Typography, Box, MenuItem, Select, InputLabel, FormControl, Grid, SelectChangeEvent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { createTask } from '../apis/TaskApi'; // Updated import to use TaskApi
 
@@ -25,8 +25,10 @@ const TaskForm = () => {
   });
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<{ name?: string | undefined; value: unknown; }>) => {
-    const name = e.target.name;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<{ name?: string | undefined; value: unknown; }> | SelectChangeEvent
+  ) => {
+    const name = 'name' in e.target ? e.target.name : undefined;
     const value = e.target.value;
 
     if (name === 'media') {
@@ -35,7 +37,6 @@ const TaskForm = () => {
         setTaskData({ ...taskData, [name]: input.files[0] });
       }
     } else if (name === 'start_date' || name === 'end_date') {
-      // Convert string to Date object for start_date and end_date
       setTaskData({ ...taskData, [name]: value ? new Date(value as string) : null });
     } else if (name) {
       setTaskData({ ...taskData, [name]: value });
@@ -45,15 +46,13 @@ const TaskForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Adjusted to directly use taskData instead of FormData, to match TaskApi expectations
       if (taskData.media instanceof File) {
-        // Convert media to Base64 string if it's a file
         const reader = new FileReader();
         reader.readAsDataURL(taskData.media);
         reader.onloadend = async () => {
           const base64String = reader.result as string;
-          const newTaskData = { ...taskData, media: base64String.replace(/^data:.+;base64,/, '') };
-          await createTask(newTaskData); // Updated to use createTask from TaskApi
+          const newTaskData: TaskData = { ...taskData, media: base64String.replace(/^data:.+;base64,/, '') } as TaskData;
+          await createTask(newTaskData); // Use the casted TaskData directly
           navigate('/tasks');
         };
         reader.onerror = (error) => {

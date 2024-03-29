@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Main from './components/Main';
 import Boards from './pages/Boards';
@@ -28,6 +28,7 @@ const RoutesComponent = () => {
         <Route path="*" element={<Navigate replace to="/404" />} />
         <Route path="/main/task/create" element={<AuthRoute element={<TaskForm />} />} />
         <Route path="/task/create" element={<Navigate replace to="/main/task/create"/>} />
+        <Route path="/passwordrecovery" element={<PassRecoveryPage />} />
         {/* Define other routes as needed */}
       </Routes>
   );
