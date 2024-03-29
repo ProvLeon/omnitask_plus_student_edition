@@ -35,11 +35,11 @@ def create_app():
     app.register_blueprint(files_route_bp)
 
 
-    return app
+    # return app
     @jwt.expired_token_loader
     def my_expired_token_callback(jwt_header, jwt_payload):
         return jsonify({"error": "Token has expired"}), 401
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=False)
+    app.run(host='127.0.0.1', port=5000)
