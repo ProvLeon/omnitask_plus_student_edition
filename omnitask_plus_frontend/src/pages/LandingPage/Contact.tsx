@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; // Import useEffect
-import { Box, Grid, Typography, TextField, Button, Container, Paper, Fade } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, Container, Paper, Fade, useMediaQuery, useTheme } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -11,9 +11,11 @@ const ContactSection = ({id}: {id:string}) => {
   const [from_name, setFromName] = useState('');
   const [contact, setContact] = useState('');
   const [from_email, setFromEmail] = useState('');
-  // const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [iconSwitch, setIconSwitch] = useState(true); // Add this line
+
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
   const to_name = import.meta.env.VITE_TO_NAME; // the name of the person to send the email to (thus you receiving the email)
 
@@ -32,10 +34,10 @@ const ContactSection = ({id}: {id:string}) => {
     // Use emailjs for handling form submissions
     try {
       const response = await send(
-        process.env.VITE_EMAILJS_SERVICE_ID || "",
-        process.env.VITE_EMAILJS_TEMPLATE_ID || "",
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || "",
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "",
         contactDetails,
-        process.env.VITE_EMAILJS_PUBLIC_KEY || ""
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ""
       );
 
       console.log('Message sent successfully', response);
@@ -49,16 +51,46 @@ const ContactSection = ({id}: {id:string}) => {
     setFromName('');
     setContact('');
     setFromEmail('');
-    // setSubject('');
     setMessage('');
   };
 
   return (
-    <Container id={id} maxWidth="lg" sx={{ my: 10, paddingTop:'10px' }}>
-      <Paper elevation={3} sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+    <Container id={id} maxWidth="lg" sx={{ my: 10, paddingTop:'10px', overflow: 'hidden' }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, display: 'flex', flexDirection: 'column', gap: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
         <Grid container spacing={4}>
+          <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' , textAlign: matches ? 'center' : 'inherit'}}>
+            <div className='flex flex-row justify-center'>
+            <Typography variant="h5" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold'}} component="div">
+              We'd love to hear from you!
+            </Typography>
+              <Box sx={{  display: 'flex', alignItems: 'center'}} >
+                <Fade in={iconSwitch} timeout={600}>
+                  <MailOutlineIcon sx={{ color: '#1976d2', fontSize: 40, position: 'absolute' }} />
+                </Fade>
+                <Fade in={!iconSwitch} timeout={600}>
+                  <PhoneIcon sx={{ color: '#1976d2', fontSize: 40, position: 'absolute' }} />
+                </Fade>
+              </Box>
+              </div>
+            <Typography paragraph sx={{ textAlign: 'justify', mt: 2 }}>
+              Whether you have a question about features, trials, need a demo, or anything else, our team is ready to answer all your questions.
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              Email: <a href="mailto:leotech.digital@gmail.com" style={{ textDecoration: 'none', color: '#1976d2' }}>leotech.digital@gmail.com</a>
+            </Typography>
+            <div className={`flex gap-4 mt-2 ${matches ? 'justify-center' : ''}`}>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              Follow us on:
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, color: '#1976d2', mt:1 }}>
+              <a href={import.meta.env.VITE_LINKEDIN_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><LinkedInIcon /></a>
+              <a href={import.meta.env.VITE_GITHUB_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><GitHubIcon /></a>
+              <a href={import.meta.env.VITE_TWITTER_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><XIcon /></a>
+            </Box>
+            </div>
+          </Grid>
           <Grid item xs={12} md={6}>
-            <Typography variant="h4" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold' }}>Contact Us</Typography>
+            <Typography variant="h4" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold', textAlign: matches ? 'center' : 'inherit' }}>Contact Us</Typography>
             <form onSubmit={handleSubmit}>
               <TextField
                 label="Name"
@@ -85,14 +117,6 @@ const ContactSection = ({id}: {id:string}) => {
                 onChange={(e) => setFromEmail(e.target.value)}
                 sx={{ mb: 2 }}
               />
-              {/* <TextField
-                label="Subject"
-                fullWidth
-                required
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                sx={{ mb: 2 }}
-              /> */}
               <TextField
                 label="Message"
                 fullWidth
@@ -103,39 +127,8 @@ const ContactSection = ({id}: {id:string}) => {
                 onChange={(e) => setMessage(e.target.value)}
                 sx={{ mb: 2 }}
               />
-              <Button type="submit" variant="contained" color="primary" sx={{ boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>Send Message</Button>
+              <Button type="submit" variant="contained" color="primary" fullWidth={matches} sx={{ boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>Send Message</Button>
             </form>
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center' }}>
-            <div className='flex flex-row items-center'>
-            <Typography variant="h5" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold'}} component="div">
-              We'd love to hear from you!
-            </Typography>
-              <Box sx={{  display: 'flex', alignItems: 'center'}} >
-                <Fade in={iconSwitch} timeout={600}>
-                  <MailOutlineIcon sx={{ color: '#1976d2', fontSize: 40, position: 'absolute' }} />
-                </Fade>
-                <Fade in={!iconSwitch} timeout={600}>
-                  <PhoneIcon sx={{ color: '#1976d2', fontSize: 40, position: 'absolute' }} />
-                </Fade>
-              </Box>
-              </div>
-            <Typography paragraph sx={{ textAlign: 'justify' }}>
-              Whether you have a question about features, trials, need a demo, or anything else, our team is ready to answer all your questions.
-            </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              Email: <a href="mailto:leotech.digital@gmail.com" style={{ textDecoration: 'none', color: '#1976d2' }}>leotech.digital@gmail.com</a>
-            </Typography>
-            <div className='flex gap-4'>
-            <Typography variant="body1" sx={{ mt: 1 }}>
-              Follow us on:
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, color: '#1976d2', mt:1 }}>
-              <a href={import.meta.env.VITE_LINKEDIN_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><LinkedInIcon /></a>
-              <a href={import.meta.env.VITE_GITHUB_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><GitHubIcon /></a>
-              <a href={import.meta.env.VITE_TWITTER_LINK} style={{ textDecoration: 'none', color: '#1976d2' }}><XIcon /></a>
-            </Box>
-            </div>
           </Grid>
         </Grid>
       </Paper>
