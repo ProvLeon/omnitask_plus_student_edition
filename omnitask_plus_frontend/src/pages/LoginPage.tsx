@@ -90,9 +90,9 @@ const LoginPage = () => {
                   Login
                 </Button>
                 <div className='flex gap-2'>
-                  <text className='p-2' >
+                  <p className='p-2' >
                     Forgotten Your Password?
-                  </text>
+                  </p>
                 <Link className='text-blue-900 self-center' to="/passwordrecovery" >Click Here</Link>
                 </div>
               </form>

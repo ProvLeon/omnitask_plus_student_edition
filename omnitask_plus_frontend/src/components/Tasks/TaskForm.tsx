@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, MenuItem, Select, InputLabel, FormControl, Grid, SelectChangeEvent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { createTask } from '../apis/TaskApi'; // Updated import to use TaskApi
+import { createTask, fileToBase64 } from '../apis/TaskApi'; // Updated import to use TaskApi
 
 interface TaskData {
   title: string;
@@ -47,17 +47,10 @@ const TaskForm = () => {
     e.preventDefault();
     try {
       if (taskData.media instanceof File) {
-        const reader = new FileReader();
-        reader.readAsDataURL(taskData.media);
-        reader.onloadend = async () => {
-          const base64String = reader.result as string;
-          const newTaskData: TaskData = { ...taskData, media: base64String.replace(/^data:.+;base64,/, '') } as TaskData;
-          await createTask(newTaskData); // Use the casted TaskData directly
-          navigate('/tasks');
-        };
-        reader.onerror = (error) => {
-          console.error('Error converting file:', error);
-        };
+        const base64String = await fileToBase64(taskData.media); // Await the promise
+        const newTaskData: TaskData = { ...taskData, media: base64String }; // Use the awaited string
+        await createTask(newTaskData);
+        navigate('/tasks');
       } else {
         // If no media or not a file, proceed without conversion
         await createTask(taskData); // Updated to use createTask from TaskApi

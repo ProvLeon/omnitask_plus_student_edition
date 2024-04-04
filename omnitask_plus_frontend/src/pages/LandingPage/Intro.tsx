@@ -45,10 +45,10 @@ const IntroSection = ({id}: {id: string}) => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => navigate('/features')}
+            onClick={() => navigate('/login')}
             sx={{ marginTop: '20px' }}
           >
-            Explore Features
+            Log In
           </Button>
         </Grid>
       </Grid>

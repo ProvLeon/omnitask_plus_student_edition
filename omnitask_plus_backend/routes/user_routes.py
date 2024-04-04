@@ -143,6 +143,7 @@ def update_user_image():
     base64_image_string = request.json.get('image')
 
     image_url = base64_to_file(base64_image_string, user_id)
+    # print(image_url)
 
     user = session.query(User).filter_by(id=user_id).first()
     if user:

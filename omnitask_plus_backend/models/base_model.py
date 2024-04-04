@@ -1,4 +1,3 @@
-from sqlalchemy import create_engine, Column, Integer, DateTime, String  # Add DateTime to the import
 from sqlalchemy import create_engine, Column, Integer, DateTime, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
@@ -8,8 +7,6 @@ from datetime import datetime
 import uuid
 import base64
 import os
-from PIL import Image
-import io
 import mimetypes
 from flask import current_app
 
@@ -24,32 +21,12 @@ class BaseModel(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        if kwargs:
-            for key, value in kwargs.items():
-                if key != "__class__":
-                    setattr(self, key, value)
-            if kwargs.get("created_at", None) and isinstance(self.created_at, str):
-                self.created_at = datetime.strptime(kwargs["created_at"], time_format)
-            else:
-                self.created_at = datetime.utcnow()
-            if kwargs.get("updated_at", None) and isinstance(self.updated_at, str):
-                self.updated_at = datetime.strptime(kwargs["updated_at"], time_format)
-            else:
-                self.updated_at = datetime.utcnow()
-
-            if 'id' not in kwargs:
-                self.id = uuid.uuid4()
-
-        else:
-            self.id = uuid.uuid4()
-            self.created_at = datetime.utcnow()
-            self.updated_at = self.created_at
+        super().__init__(*args, **kwargs)  # Simplified constructor with super call
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
 
     def to_dict(self):
-        model_dict = {}
-        for c in inspect(self).mapper.column_attrs:
-            value = getattr(self, c.key)
-            model_dict[c.key] = value
+        model_dict = {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
         return model_dict
 
 def base64_to_string(image_bytes):
@@ -65,23 +42,29 @@ def base64_to_file(base64_string, file_name):
     mime_type = header.split(';')[0].split(':')[1]
 
     # Determine the directory and file extension based on MIME type
+    directory = 'uploads'
     if 'image' in mime_type:
-        directory = 'uploads/images'
-        file_extension = mimetypes.guess_extension(mime_type)
+        directory = os.path.join(directory, 'images')
     elif 'application' in mime_type or 'text' in mime_type:
-        directory = 'uploads/docs'
-        file_extension = mimetypes.guess_extension(mime_type)
+        directory = os.path.join(directory, 'docs')
     else:
         raise ValueError("Unsupported file type")
 
-    # Ensure the directory exists
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    file_extension = mimetypes.guess_extension(mime_type)
+    if not file_extension:
+        raise ValueError("Could not determine file extension")
 
-    file_path = f'{directory}/{file_name}{file_extension}'
+    # Ensure the directory exists
+    os.makedirs(directory, exist_ok=True)
+
+    # Generate a unique file name to avoid collisions
+    unique_file_name = f"{file_name}_{uuid.uuid4().hex}{file_extension}"
+    file_path = os.path.join(directory, unique_file_name)
+
+    # Save the decoded data to a file
     with open(file_path, 'wb') as file:
         file.write(data)
 
     # Assuming the server is configured to serve files from 'uploads/' at '/uploads/'
     BASE_URL = current_app.config['BASE_URL']
-    return f'{BASE_URL}/api/files/{file_path.strip("uploads/")}'
+    return f'{BASE_URL}/api/files/{os.path.relpath(file_path, start="uploads/")}'

@@ -28,11 +28,14 @@ const loginUser = async (credentials: { username: string; password: string }) =>
 const refreshAccessToken = async () => {
   try {
     const refreshToken = localStorage.getItem('refreshToken');
-    const response = await axios.post(`${BASE_URL}/token/refresh`, JSON.stringify({ refreshToken }), {
+    // const access_token = localStorage.getItem('accessToken');
+    const response = await axios.post(`${BASE_URL}/token/refresh`, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${refreshToken}`,
       },
     });
+    console.log(refreshToken)
     const { accessToken } = response.data;
     localStorage.setItem('accessToken', accessToken);
     return accessToken;

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from database import session
 from models.task import Task
-from models.base_model import time_format
+from models.base_model import base64_to_file, time_format
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
@@ -28,30 +28,18 @@ def create_task():
         current_user_id = get_jwt_identity()  # Get the current user's ID from the JWT token
         task_data = {}
 
-        # Handle JSON content type
-        # if 'application/json' in request.content_type:
-        task_data = request.get_json()
+        # Create a new Task instance
+        task = Task()
 
-        # Handle form data
-        # else:
-        #     task_data = request.form.to_dict()
-
-
-        # Handle file upload separately
-        # if 'media' in request.files:
-        #     file = request.files['media']
-        #     if file and allowed_file(file.filename):
-        #         extension = file.filename.rsplit('.', 1)[1].lower()
-        #         # Temporarily create a task instance to generate an ID for filename
-        #         temp_task = Task(user_id=current_user_id)
-        #         session.add(temp_task)
-        #         session.flush()  # This assigns an ID
-        #         filename = secure_filename(f"{temp_task.id}.{extension}")
-        #         file_path = os.path.join(DOCS_FOLDER if extension in ['txt', 'pdf'] else IMAGES_FOLDER, filename)
-        #         file.save(file_path)
-        #         task_data['media'] = f"{BASE_URL}{file_path}"
-        #         # Remove the temporary task instance if not needed
-        #         session.delete(temp_task)
+        task_data = request.json
+        for key, value in task_data.items():
+            if key == 'id':
+                continue  # Skip updating the 'id' field
+            if key == 'media':
+                base64_url = base64_to_file(value, current_user_id)
+                task_data['media'] = base64_url
+                print(task_data['media'])
+            setattr(task, key, value)
 
         # Ensure user_id is assigned
         task_data['user_id'] = current_user_id
