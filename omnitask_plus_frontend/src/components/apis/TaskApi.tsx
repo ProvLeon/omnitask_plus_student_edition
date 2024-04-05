@@ -1,24 +1,19 @@
 import axios from 'axios';
 
-// Utilize environment variable for BASE_URL
-// Fix: Directly access environment variables using import.meta.env
-const BASE_URL = import.meta.env.VITE_REACT_APP_BASE_URL + '/tasks';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL + '/tasks';
 
-// Function to get the authorization token
 const getAuthToken = (): string | null => {
   const token = localStorage.getItem('accessToken');
   return token;
 };
 
-// Enhanced Axios instance with base configurations
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json', // Updated to handle JSON data
+    'Content-Type': 'application/json',
   },
 });
 
-// Interceptor to add the Authorization token to every request
 axiosInstance.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
@@ -29,32 +24,10 @@ axiosInstance.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Helper function to convert Base64 to File
-// const base64ToFile = (base64: string, filename: string): File => {
-//   const arr = base64.split(',');
-//   const mimeMatch = arr[0].match(/:(.*?);/);
-//   if (!mimeMatch) throw new Error('MIME type could not be determined from base64 string');
-//   const mime = mimeMatch[1];
-//   const bstr = atob(arr[1]);
-//   let n = bstr.length;
-//   const u8arr = new Uint8Array(n);
-
-//   while (n--) {
-//     u8arr[n] = bstr.charCodeAt(n);
-//   }
-
-//   return new File([u8arr], filename, { type: mime });
-// };
-
-// API call to fetch tasks
 const getTasks = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get('/');
     const tasks = response.data.map((task: any) => {
-      // if (task.media) {
-      //   const filename = `${task.id}.${task.media.split('.').pop()}`; // Extract extension and prepend task ID
-      //   task.media = base64ToFile(task.media, filename);
-      // }
       return task;
     });
     return tasks;
@@ -64,11 +37,10 @@ const getTasks = async (): Promise<any> => {
 };
 
 interface TaskData {
-  [key: string]: any; // Allows any property with string key
-  media?: File | string | null; // Media can be File, string, or null
+  [key: string]: any;
+  media?: File | string | null;
 }
 
-// Helper function to convert file to Base64
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -125,4 +97,34 @@ const deleteTask = async (taskId: string): Promise<any> => {
   }
 };
 
-export { getTasks, createTask, updateTask, deleteTask, fileToBase64 };
+// API call to update task status
+const updateTaskStatus = async (taskId: string, status: string): Promise<any> => {
+  try {
+    const response = await axiosInstance.put(`/${taskId}/status`, { status: status }, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+// API call to update a specific task attribute
+const updateTaskAttribute = async (taskId: string, attribute: string, value: any): Promise<any> => {
+  try {
+    const response = await axiosInstance.put(`/${taskId}/${attribute}`, { value: value }, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export { getTasks, createTask, updateTask, deleteTask, fileToBase64, updateTaskStatus, updateTaskAttribute };

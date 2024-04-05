@@ -9,8 +9,8 @@ interface ProgressBarProps {
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDate = new Date(), progressCategory }) => {
   const calculateProgress = () => {
-    const totalDurationDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
-    const daysUntilEnd = (endDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24);
+    const totalDurationDays = (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24);
+    const daysUntilEnd = (new Date(endDate).getTime() - new Date(currentDate).getTime()) / (1000 * 3600 * 24);
 
     if (totalDurationDays >= 100) {
       if (daysUntilEnd < 5 && daysUntilEnd > 1) {
@@ -19,13 +19,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
         return 100;
       }
     }
-    else if (endDate.getTime().toPrecision(4) == currentDate.getTime().toPrecision(4)) {
+    else if (new Date(endDate).getTime().toPrecision(4) == new Date(currentDate).getTime().toPrecision(4)) {
       return 100;
     }
-    const now = currentDate.getTime();
+    const now = new Date(currentDate).getTime();
     // Ensure current time is within the start and end dates
-    const adjustedNow = Math.min(Math.max(now, startDate.getTime()), endDate.getTime());
-    const currentDuration = adjustedNow - startDate.getTime();
+    const adjustedNow = Math.min(Math.max(now, new Date(startDate).getTime()), new Date(endDate).getTime());
+    const currentDuration = adjustedNow - new Date(startDate).getTime();
     const progressPercentage = (currentDuration / (totalDurationDays * 1000 * 3600 * 24)) * 100;
     return Math.min(Math.max(progressPercentage, 0), 100); // Ensures progress is between 0 and 100
 
@@ -49,11 +49,16 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
       progressBarColor = 'bg-red-500';
     }
   }
+  let progressTextDone = '';
+  if (progressCategory === 'done') {
+    progressBarColor = 'bg-green-400';
+    progressTextDone = 'Done';
+  }
 
   return (
     <div className={`w-full ${progressBarColor} flex items-center text-center rounded-full h-1.5 dark:bg-gray-700 relative`}>
       <div className={`${progressBarColor} h-2.5 rounded-full`} style={{ width: `${progress}%` }}></div>
-      <p className={`absolute w-full text-center justify-center self-center text-[8px] text-gray-800`} style={{ left: '50%', transform: 'translateX(-50%)' }}>{progressText}</p>
+      <p className={`absolute w-full text-center justify-center self-center text-[8px] text-gray-800`} style={{ left: '50%', transform: 'translateX(-50%)' }}>{progressCategory == 'done' ? progressTextDone : progressText}</p>
     </div>
   )
 }

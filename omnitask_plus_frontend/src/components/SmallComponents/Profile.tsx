@@ -6,8 +6,9 @@ import { styled } from '@mui/material/styles';
 import { Theme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import { publish } from '../../utils/pubSub'; // Adjust the path as necessary
 
-const BASE_URL = import.meta.env.VITE_REACT_APP_BASE_URL + '/api';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Item = styled(Paper)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -31,7 +32,7 @@ const Profile = () => {
     image: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const userId = localStorage.getItem('userId');
+  const userId = sessionStorage.getItem('userId');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,7 +40,7 @@ const Profile = () => {
       try {
         const response = await axios.get(`${BASE_URL}/users/getuser/${userId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
           },
         });
         const data = response.data;
@@ -71,12 +72,13 @@ const Profile = () => {
           image: base64,
         }, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             'Content-Type': 'application/json',
           },
         });
         setProfileData({ ...profileData, image: base64 });
         alert('Profile image updated successfully');
+        publish('profileUpdate', { ...profileData, image: base64 }); // Publishing the update
       } catch (error) {
         console.error('Error updating profile image:', error);
       }
@@ -91,12 +93,13 @@ const Profile = () => {
     try {
       await axios.put(`${BASE_URL}/users/update/${userId}`, updatedData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
       });
       alert('Profile updated successfully');
       setIsEditing(false);
+      publish('profileUpdate', updatedData); // Publishing the update
     } catch (error) {
       console.error('Error updating profile:', error);
     }

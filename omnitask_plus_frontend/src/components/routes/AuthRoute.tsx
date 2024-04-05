@@ -3,10 +3,10 @@ import { Navigate } from 'react-router-dom';
 import axios from 'axios'; // Assuming axios is used for HTTP requests
 
 
-const BASE_URL = import.meta.env.VITE_REACT_APP_BASE_URL
+const BASE_URL = import.meta.env.VITE_BACKEND_URL
 
 const isAuthenticated = async () => {
-  const token = localStorage.getItem('accessToken');
+  const token = sessionStorage.getItem('accessToken');
   if (!token) return false;
   try {
     // Ensure axios is configured to send the Authorization header correctly

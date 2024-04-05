@@ -37,8 +37,8 @@ const DropDown: React.FC<DropDownProps> = ({ options = ['Low', 'Medium', 'High']
   };
 
   return (
-    <div className="relative dark:bg-gray-800" >
-      <button onClick={toggleDropdown} className={` px-2 py-1 w-20 text-[12px] ${getButtonBgColor()} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300`}>
+    <div className="relative dark:bg-gray-800 shadow-md rounded-md" >
+      <button onClick={toggleDropdown} className={` px-2 py-1 w-20 text-[12px] hover:shadow-lg hover:bg-gray-400 ${getButtonBgColor()} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-3000`}>
         {selectedOption}
       </button>
       {isOpen && (

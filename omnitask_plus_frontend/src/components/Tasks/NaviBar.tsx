@@ -3,29 +3,67 @@ import { useState, useEffect, useRef } from 'react';
 import { MaterialUISwitch } from '../MUI';
 import { NotificationsOutlined, Close } from '@mui/icons-material'; // Added Close icon import
 import Profile from '../SmallComponents/Profile';
+import { getUserData } from '../apis/UserApi'; // Import getUserData from UserApi
+import { subscribe } from '../../utils/pubSub'; // Adjust the path as necessary
+import PomodoroTimer from '../SmallComponents/PomodoroTimer';
 
-const Header = () => {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');
+interface ProfileData {
+  username: string;
+  image: string;
+}
+
+const NaviBar = () => {
+  // const [theme, setTheme] = useState(() => localStorage.getItem('theme') ?? 'light');
   const [showProfile, setShowProfile] = useState(false);
   const profileRef = useRef(null);
 
-  const storedTheme = localStorage.getItem('theme');
-  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // State to store user profile data
+  const [profileData, setProfileData] = useState({
+    username: '',
+    image: '',
+  });
+
+  // const storedTheme = sessionStorage.getItem('theme');
+  // const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   useEffect(() => {
-    const selectedTheme = storedTheme ? storedTheme : prefersDarkMode ? 'dark' : 'light';
+    // const selectedTheme = storedTheme ? storedTheme : prefersDarkMode ? 'dark' : 'light';
 
-    document.documentElement.classList.add(`${selectedTheme}`);
-    setTheme(selectedTheme);
+    // document.documentElement.classList.add(`${selectedTheme}`);
+    // setTheme(selectedTheme);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.classList.add(`${newTheme}`);
-    document.documentElement.classList.remove(`${theme}`);
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) return;
+      try {
+        const data = await getUserData(userId); // Use getUserData from UserApi
+        const { username, image } = data;
+        setProfileData({ username, image });
+        // console.log(image);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const unsubscribe = subscribe('profileUpdate', (updatedProfileData: ProfileData) => {
+      setProfileData(updatedProfileData);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // const toggleTheme = () => {
+  //   const newTheme = theme === 'light' ? 'dark' : 'light';
+  //   document.documentElement.classList.add(`${newTheme}`);
+  //   document.documentElement.classList.remove(`${theme}`);
+  //   setTheme(newTheme);
+  //   localStorage.setItem('theme', newTheme);
+  // };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,15 +109,17 @@ const Header = () => {
               <Link to="/chat" className="text-gray-800 dark:text-white">Chat</Link>
             </div>
           </div>
+          <div className="flex justify-center items-center flex-grow">
+            <PomodoroTimer/>
+          </div>
           <div className="flex items-center">
-              <MaterialUISwitch onClick={toggleTheme} className='mr-4'/>
             <div className="relative mr-4 cursor-pointer">
               <span className="absolute right-0 top-0 rounded-[100px] w-4 h-4 text-center bg-red-500 text-white text-xs">3</span>
               <NotificationsOutlined className=' text-gray-800 dark:text-white w-10 h-10'/>
             </div>
             <div id="profile" className="flex items-center cursor-pointer" onClick={handleProfileClick} ref={profileRef}>
-              <img src="https://images.unsplash.com/photo-1531727991582-cfd25ce79613?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Profile" className="w-8 h-8 rounded-full mr-2"/>
-              <span className="text-sm text-gray-800 dark:text-white">ProvLeon</span>
+              <img src={profileData.image} alt="Profile" className="w-8 h-8 rounded-full mr-2"/>
+              <span className="text-sm text-gray-800 dark:text-white">{profileData.username}</span>
             </div>
           </div>
         </nav>
@@ -96,4 +136,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default NaviBar

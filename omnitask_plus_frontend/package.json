@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy": "http://127.0.0.1:9614/204",
+  "proxy": "http://127.0.0.1:9614",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -22,13 +22,18 @@
     "firebase": "^10.9.0",
     "framer-motion": "^11.0.20",
     "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-datepicker": "^6.5.0",
     "react-dom": "^18.2.0",
+    "react-pdf": "^7.7.1",
     "react-router-dom": "^6.22.3",
-    "react-scroll": "^1.9.0"
+    "react-scroll": "^1.9.0",
+    "socket.io-client": "^4.7.5",
+    "use-sound": "^4.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-datepicker": "^6.2.0",
     "@types/react-dom": "^18.2.22",
     "@types/react-scroll": "^1.8.10",

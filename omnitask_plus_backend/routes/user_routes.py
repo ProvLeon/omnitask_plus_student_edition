@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 from models.schemas import UserSchema
 from datetime import datetime
-from models.base_model import time_format, base64_to_file
+from models.base_model import time_format, base64_to_file, delete_file
 # import base64
 
 bp = Blueprint('user_routes', __name__, url_prefix='/api/users')
@@ -77,9 +77,31 @@ def create_user():
 def get_users():
     try:
         users = session.query(User).all()
+        print(users.Users)
         return jsonify([user.to_dict() for user in users]), 200
     except Exception as e:
         app.logger.error(f"Error fetching users: {e}")
+        return jsonify(error=str(e)), 400
+
+# Fetch a user by username or email
+@bp.route('/', methods=['GET'])
+def fetch_user_by_username_or_email():
+    username = request.args.get('username')
+    email = request.args.get('email')
+    try:
+        if username:
+            user = session.query(User).filter(User.username == username).first()
+        elif email:
+            user = session.query(User).filter(User.email == email).first()
+        else:
+            return jsonify(error="Username or Email parameter is required"), 400
+
+        if user:
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify(error="User not found"), 404
+    except Exception as e:
+        app.logger.error(f"Error fetching user: {e}")
         return jsonify(error=str(e)), 400
 
 # Get a single user by ID
@@ -109,46 +131,16 @@ def update_user(user_id):
             if key == 'id':
                 continue  # Skip updating the 'id' field
             if key == 'image':
+                if user.image:
+                    delete_file(user.image)
                 value = base64_to_file(value, user_id_uuid)
             setattr(user, key, value)
-        user.updated_at = datetime.utcnow().strftime(time_format)  # Update 'updated_at' field
+
+        # user.updated_at = datetime.now()
         session.commit()
         return jsonify(user.to_dict()), 200
     except SQLAlchemyError as e:
         session.rollback()
-        app.logger.error(f"Failed to update user: {e} (user_id={user_id})")
+        app.logger.error(f"Failed to update user: {e}")
         return jsonify(error=str(e)), 400
-    except ValueError as ve:
-        return jsonify(error="Invalid UUID format " + str(ve)), 400
 
-# Delete a user
-@bp.route('/delete/<user_id>', methods=['DELETE'])
-def delete_user(user_id):
-    try:
-        user_id_uuid = UUID(user_id)
-        user = session.query(User).filter(User.id == user_id_uuid).first()
-        if user:
-            session.delete(user)
-            session.commit()
-            return jsonify(success=True), 204
-        else:
-            return jsonify(error="User not found"), 404
-    except ValueError:
-        return jsonify(error="Invalid UUID format"), 400
-
-
-@bp.route('/update_user_image', methods=['POST'])
-def update_user_image():
-    user_id = UUID(request.json.get('user_id'))
-    base64_image_string = request.json.get('image')
-
-    image_url = base64_to_file(base64_image_string, user_id)
-    # print(image_url)
-
-    user = session.query(User).filter_by(id=user_id).first()
-    if user:
-        user.image = image_url
-        session.commit()
-        return jsonify({"message": "Image updated successfully"}), 200
-    else:
-        return jsonify({"error": "User not found"}), 404

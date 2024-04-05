@@ -9,7 +9,7 @@ interface TaskData {
   start_date: Date | null; // Changed to Date type to match backend expectation
   end_date: Date | null; // Changed to Date type to match backend expectation
   priority: 'low' | 'medium' | 'high'; // Added priority to match backend expectation
-  status: 'todo' | 'in progress' | 'completed'; // Added status to match backend expectation
+  status: 'todo' | 'in progress' | 'done'; // Added status to match backend expectation
   media: File | string | null; // Allow media to be File, string, or null
 }
 
@@ -156,7 +156,7 @@ const TaskForm = () => {
             >
               <MenuItem value="todo">Todo</MenuItem>
               <MenuItem value="in progress">In Progress</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
+              <MenuItem value="done">Done</MenuItem>
             </Select>
           </FormControl>
         </Grid>

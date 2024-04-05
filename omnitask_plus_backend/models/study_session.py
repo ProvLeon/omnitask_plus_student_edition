@@ -1,13 +1,14 @@
 from .user import User
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from .base_model import Base, BaseModel
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID
 
 class StudySession(BaseModel, Base):
     __tablename__ = 'study_sessions'
     # id = Column(Integer, primary_key=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id'), nullable=False)
     session_name = Column(String(100), nullable=False)
     session_description = Column(Text, nullable=False)
     start_time = Column(DateTime, nullable=False, default=datetime.utcnow)

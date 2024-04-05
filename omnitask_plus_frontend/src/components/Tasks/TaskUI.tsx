@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Button, Modal, Box, IconButton, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { useState, useEffect, useMemo } from 'react';
+import { Button, Modal, Box, IconButton, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent, TableSortLabel } from '@mui/material';
 import TaskForm from './TaskForm';
 import CloseIcon from '@mui/icons-material/Close';
-import { getTasks } from '../apis/TaskApi'; // Updated import to use getTasks from TaskApi
-import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer'; // Updated import to use @cyntler/react-doc-viewer
+import DeleteIcon from '@mui/icons-material/Delete';
+import { getTasks, deleteTask } from '../apis/TaskApi';
+import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 
 interface Task {
   id: number;
@@ -13,7 +14,7 @@ interface Task {
   start_date: string;
   end_date: string;
   status: 'todo' | 'in progress' | 'completed';
-  media?: string; // Optional media URL
+  media?: string;
 }
 
 const priorityLevels = { 'high': 1, 'medium': 2, 'low': 3 };
@@ -29,31 +30,54 @@ const TaskUI = () => {
   const [mediaOpen, setMediaOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<string | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('asc');
+  const [orderBy, setOrderBy] = useState<keyof Task>('start_date');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const fetchTasks = async () => {
-      let tasksData = await getTasks(); // Updated to use getTasks from TaskApi
-      // Sort tasks by priority and then by date
-      tasksData.sort((a: Task, b: Task) => {
-        return priorityLevels[a.priority] - priorityLevels[b.priority] || new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-      });
+      let tasksData = await getTasks();
       setTasks(tasksData);
-      console.log(tasksData)
     };
     fetchTasks();
   }, []);
+
+  const handleRequestSort = (property: keyof Task) => {
+    const isAsc = orderBy === property && orderDirection === 'asc';
+    setOrderDirection(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedTasks = useMemo(() => {
+    return tasks.sort((a, b) => {
+      let comparison = 0;
+      if (orderBy === 'priority') {
+        comparison = priorityLevels[a.priority] - priorityLevels[b.priority];
+      } else if (orderBy === 'status') {
+        comparison = a.status.localeCompare(b.status);
+      } else {
+        const aValue = a[orderBy] || '';
+        const bValue = b[orderBy] || '';
+        comparison = new Date(aValue).getTime() - new Date(bValue).getTime();
+      }
+      return orderDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [tasks, orderBy, orderDirection]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleMediaOpen = (mediaUrl: string) => {
     setSelectedMedia(mediaUrl);
-    // console.log(mediaUrl)
     setMediaOpen(true);
   };
   const handleMediaClose = () => setMediaOpen(false);
+
+  const handleDeleteTask = async (taskId: number) => {
+    await deleteTask(taskId.toString());
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
 
   const modalStyle = {
     position: 'absolute',
@@ -71,14 +95,12 @@ const TaskUI = () => {
   };
 
   return (
-    <div style={{ filter: open ? 'blur(4px)' : 'none', pointerEvents: open ? 'none' : 'auto' }}>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Create Task
-      </Button>
+    <div>
+
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="create-task-modal"
+        aria-labelledby="create-task-modal-title"
         aria-describedby="create-task-form"
       >
         <Box sx={modalStyle}>
@@ -97,25 +119,69 @@ const TaskUI = () => {
           <TaskForm />
         </Box>
       </Modal>
-      <Typography variant="h4" sx={{ mt: 5, mb: 2 }}>
+      <Typography variant="h4" sx={{ mt: 5, mb: 2, textAlign: 'center' }}>
         Tasks
+        <Button variant="contained" onClick={handleOpen} sx={{ ml: 2, mb: 2, alignSelf: 'center' }}>
+        Create Task
+      </Button>
       </Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: isMobile ? 200 : 650 }} aria-label="task table" size="small">
+      <TableContainer component={Paper} sx={{marginLeft: '5%', marginRight: '5%'}}>
+        <Table sx={{ minWidth: isMobile ? 200 : 960 }} aria-label="task table" size="small">
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell align="right">Priority</TableCell>
-              <TableCell align="right">Description</TableCell>
-              <TableCell align="right">Start Date</TableCell>
-              <TableCell align="right">End Date</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Media</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'title'}
+                  direction={orderBy === 'title' ? orderDirection : 'asc'}
+                  onClick={() => handleRequestSort('title')}
+                >
+                  Title
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">
+                <TableSortLabel
+                  active={orderBy === 'priority'}
+                  direction={orderBy === 'priority' ? orderDirection : 'asc'}
+                  onClick={() => handleRequestSort('priority')}
+                >
+                  PRIORITY
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">DESCRIPTION</TableCell>
+              <TableCell align="right">
+                <TableSortLabel
+                  active={orderBy === 'start_date'}
+                  direction={orderBy === 'start_date' ? orderDirection : 'asc'}
+                  onClick={() => handleRequestSort('start_date')}
+                >
+                  START DATE
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">
+                <TableSortLabel
+                  active={orderBy === 'end_date'}
+                  direction={orderBy === 'end_date' ? orderDirection : 'asc'}
+                  onClick={() => handleRequestSort('end_date')}
+                >
+                  END DATE
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">
+                <TableSortLabel
+                  active={orderBy === 'status'}
+                  direction={orderBy === 'status' ? orderDirection : 'asc'}
+                  onClick={() => handleRequestSort('status')}
+                >
+                  STATUS
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">MEDIA</TableCell>
+              <TableCell align="right">DELETE</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tasks.map((task, index) => (
+            {sortedTasks.map((task, index) => (
               <TableRow
                 key={task.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 }, border: 1, borderColor: 'divider' }}
@@ -131,7 +197,18 @@ const TaskUI = () => {
                 <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider' }}>{formatDate(task.start_date)}</TableCell>
                 <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider' }}>{formatDate(task.end_date)}</TableCell>
                 <TableCell align="right">{task.status}</TableCell>
-                <TableCell align="right" sx={{ cursor: 'pointer' }} onClick={() => task.media && handleMediaOpen(task.media)}>View</TableCell>
+                <TableCell align="right">
+                  {task.media ? (
+                    <Button onClick={() => task.media && handleMediaOpen(task.media)}>View</Button>
+                  ) : (
+                    <Typography>No Media</Typography>
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={() => handleDeleteTask(task.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -146,8 +223,14 @@ const TaskUI = () => {
             ) : (
               <DocViewer
                 pluginRenderers={DocViewerRenderers}
-                documents={[{ uri: selectedMedia }]}
-                style={{ width: '100%', height: '500px' }}
+                documents={[{ uri: selectedMedia, fileType: selectedMedia.split('.').pop() }]}
+                config={{
+                  header: {
+                    disableHeader: true,
+                    disableFileName: true,
+                    retainURLParams: true
+                  }
+                }}
               />
             )
           ) : (
@@ -160,4 +243,3 @@ const TaskUI = () => {
 }
 
 export default TaskUI
-
