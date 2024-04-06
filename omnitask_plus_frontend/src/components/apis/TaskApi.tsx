@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { fileToBase64 } from '../../utils/utils';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL + '/tasks';
 
 const getAuthToken = (): string | null => {
-  const token = localStorage.getItem('accessToken');
+  const token = sessionStorage.getItem('accessToken');
   return token;
 };
 
@@ -41,14 +42,6 @@ interface TaskData {
   media?: File | string | null;
 }
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-    reader.readAsDataURL(file);
-  });
-};
 
 const createTask = async (taskData: TaskData): Promise<any> => {
   if (taskData.media && (taskData.media instanceof File)) {
@@ -127,4 +120,4 @@ const updateTaskAttribute = async (taskId: string, attribute: string, value: any
 };
 
 
-export { getTasks, createTask, updateTask, deleteTask, fileToBase64, updateTaskStatus, updateTaskAttribute };
+export { getTasks, createTask, updateTask, deleteTask, updateTaskStatus, updateTaskAttribute };

@@ -6,16 +6,16 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import useSound from 'use-sound';
 import peepSound from '../../sounds/alarm_peep.wav'; // Assuming the sound file is located in the sounds folder
 
-const PomodoroTimer = () => {
+const PomodoroTimer = ({className}: {className?: string}) => {
   const [open, setOpen] = useState(false);
-  const userId = localStorage.getItem('userId'); // Assuming there's a userId stored in localStorage
+  const userId = sessionStorage.getItem('userId'); // Assuming there's a userId stored in localStorage
   // Retrieve the remaining time and active state from localStorage or set defaults
   const [time, setTime] = useState(() => {
-    const savedTime = localStorage.getItem(`pomodoroTime_${userId}`);
+    const savedTime = sessionStorage.getItem(`pomodoroTime_${userId}`);
     return savedTime ? parseInt(savedTime, 10) : 25 * 60; // Default Pomodoro time 25 minutes
   });
   const [isActive, setIsActive] = useState(() => {
-    const savedIsActive = localStorage.getItem(`pomodoroIsActive_${userId}`);
+    const savedIsActive = sessionStorage.getItem(`pomodoroIsActive_${userId}`);
     return savedIsActive ? savedIsActive === 'true' : false;
   });
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
@@ -27,13 +27,18 @@ const PomodoroTimer = () => {
 
   const toggle = () => {
     setIsActive(!isActive);
-    localStorage.setItem(`pomodoroIsActive_${userId}`, (!isActive).toString());
-    if (!isActive) {
+    sessionStorage.setItem(`pomodoroIsActive_${userId}`, (!isActive).toString());
+    if (!isActive && time > 0) { // Check if time is greater than 0 before starting the timer
       const id = setInterval(() => {
         setTime((prevTime) => {
           const newTime = prevTime - 1;
-          localStorage.setItem(`pomodoroTime_${userId}`, newTime.toString());
-          return newTime;
+          if (newTime >= 0) { // Ensure time does not go below 0
+            sessionStorage.setItem(`pomodoroTime_${userId}`, newTime.toString());
+            return newTime;
+          } else {
+            clearInterval(id); // Stop the timer if time reaches 0
+            return 0; // Ensure time is set to 0
+          }
         });
       }, 1000);
       setIntervalId(id);
@@ -44,9 +49,9 @@ const PomodoroTimer = () => {
 
   const reset = () => {
     setTime(25 * 60);
-    localStorage.setItem(`pomodoroTime_${userId}`, (25 * 60).toString());
+    sessionStorage.setItem(`pomodoroTime_${userId}`, (25 * 60).toString());
     setIsActive(false);
-    localStorage.setItem(`pomodoroIsActive_${userId}`, 'false');
+    sessionStorage.setItem(`pomodoroIsActive_${userId}`, 'false');
     if (intervalId) clearInterval(intervalId);
   };
 
@@ -57,7 +62,7 @@ const PomodoroTimer = () => {
   useEffect(() => {
     if (time === 0) {
       setIsActive(false);
-      localStorage.setItem(`pomodoroIsActive_${userId}`, 'false');
+      sessionStorage.setItem(`pomodoroIsActive_${userId}`, 'false');
       setOpen(true);
       if (intervalId) clearInterval(intervalId);
       play();
@@ -67,12 +72,17 @@ const PomodoroTimer = () => {
 
   useEffect(() => {
     // Resume timer if it was active before page was refreshed
-    if (isActive) {
+    if (isActive && time > 0) { // Check if time is greater than 0 before resuming the timer
       const id = setInterval(() => {
         setTime((prevTime) => {
           const newTime = prevTime - 1;
-          localStorage.setItem(`pomodoroTime_${userId}`, newTime.toString());
-          return newTime;
+          if (newTime >= 0) { // Ensure time does not go below 0
+            sessionStorage.setItem(`pomodoroTime_${userId}`, newTime.toString());
+            return newTime;
+          } else {
+            clearInterval(id); // Stop the timer if time reaches 0
+            return 0; // Ensure time is set to 0
+          }
         });
       }, 1000);
       setIntervalId(id);
@@ -99,7 +109,7 @@ const PomodoroTimer = () => {
   };
 
   return (
-    <>
+    <div className={`flex justify-center items-center ${className}`}>
       <IconButton onClick={toggle} color="primary">
         {isActive ? <PauseIcon /> : <PlayArrowIcon />}
       </IconButton>
@@ -132,7 +142,7 @@ const PomodoroTimer = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 };
 

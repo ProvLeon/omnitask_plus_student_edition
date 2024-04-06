@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { fileToBase64 } from '../apis/TaskApi'; // Assuming TaskApi.tsx is in the apis folder
+import { fileToBase64 } from '../../utils/utils'; // Assuming TaskApi.tsx is in the apis folder
 import { TextField, Button, Paper, Avatar, Box, Container, Typography, IconButton, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Theme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { publish } from '../../utils/pubSub'; // Adjust the path as necessary
+import { getUserData, updateUserData, updateUserImage } from '../apis/UserApi';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Item = styled(Paper)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -38,14 +37,10 @@ const Profile = () => {
     const fetchProfile = async () => {
       if (!userId) return;
       try {
-        const response = await axios.get(`${BASE_URL}/users/getuser/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
-          },
-        });
-        const data = response.data;
-        const imageUrl = data.image ? `${data.image}` : 'default-profile.png';
-        setProfileData({ ...data, image: imageUrl });
+        const response = await getUserData(userId)
+        const {username, firstname, lastname, email, contact, image} = response;
+        const imageUrl = image ? `${image}` : 'default-profile.png';
+        setProfileData({ username, firstname, lastname, email, contact, image: imageUrl });
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
@@ -59,7 +54,7 @@ const Profile = () => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && userId) {
       const file = e.target.files[0];
       if (!file.type.startsWith('image/')) {
         alert('Error: The file must be an image.');
@@ -67,15 +62,7 @@ const Profile = () => {
       }
       const base64 = await fileToBase64(file);
       try {
-        await axios.post(`${BASE_URL}/users/update_user_image`, {
-          user_id: userId,
-          image: base64,
-        }, {
-          headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        await updateUserData(userId, base64);
         setProfileData({ ...profileData, image: base64 });
         alert('Profile image updated successfully');
         publish('profileUpdate', { ...profileData, image: base64 }); // Publishing the update
@@ -91,12 +78,7 @@ const Profile = () => {
     const updatedData = { ...profileData };
 
     try {
-      await axios.put(`${BASE_URL}/users/update/${userId}`, updatedData, {
-        headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await updateUserData(userId, updatedData);
       alert('Profile updated successfully');
       setIsEditing(false);
       publish('profileUpdate', updatedData); // Publishing the update

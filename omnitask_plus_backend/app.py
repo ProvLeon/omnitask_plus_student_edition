@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from database import init_db
+from routes.chat_routes import init_socketio
 
 # def create_app():
 app = Flask(__name__)
@@ -28,11 +29,13 @@ from routes.task_routes import bp as task_routes_bp
 from routes.study_sessions_routes import bp as study_sessions_routes_bp
 from routes.login import bp as login_bp
 from routes.files_route import bp as files_route_bp
+from routes.chat_routes import chat_bp as chat_route_bp
 app.register_blueprint(user_routes_bp)
 app.register_blueprint(task_routes_bp)
 app.register_blueprint(study_sessions_routes_bp)
 app.register_blueprint(login_bp)
 app.register_blueprint(files_route_bp)
+app.register_blueprint(chat_route_bp)
 
 
 # return app
@@ -42,4 +45,5 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 if __name__ == '__main__':
     # app = create_app()
+    init_socketio(app)
     app.run()

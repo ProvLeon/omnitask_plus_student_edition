@@ -77,7 +77,7 @@ def create_user():
 def get_users():
     try:
         users = session.query(User).all()
-        print(users.Users)
+        # print(users.Users)
         return jsonify([user.to_dict() for user in users]), 200
     except Exception as e:
         app.logger.error(f"Error fetching users: {e}")
@@ -133,6 +133,7 @@ def update_user(user_id):
             if key == 'image':
                 if user.image:
                     delete_file(user.image)
+                print(user.image)
                 value = base64_to_file(value, user_id_uuid)
             setattr(user, key, value)
 

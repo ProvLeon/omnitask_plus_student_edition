@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, MenuItem, Select, InputLabel, FormControl, Grid, SelectChangeEvent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { createTask, fileToBase64 } from '../apis/TaskApi'; // Updated import to use TaskApi
+import { createTask } from '../apis/TaskApi'; // Updated import to use TaskApi
+import { fileToBase64 } from '../../utils/utils';
 
 interface TaskData {
   title: string;

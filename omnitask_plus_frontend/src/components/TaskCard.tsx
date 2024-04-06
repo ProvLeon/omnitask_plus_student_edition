@@ -80,7 +80,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
   ]
 
   return (
-    <div className='hover:shadow-lg hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-800 cursor-pointer shadow-md flex flex-col bg-white rounded-lg p-4 w-[300px] gap-2 relative' >
+    <div className='hover:shadow-lg hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-800 cursor-pointer shadow-md flex flex-col bg-white rounded-lg p-4 w-full md:w-[300px] gap-2 relative' >
       <div id='vertical' className='absolute top-0 left-0 dark:bg-blue-900 bg-blue-500 w-1 h-full rounded-l-full'></div>
       <div className='flex justify-between items-center'>
         <h1 className='text-xl font-bold'>{title}</h1>
