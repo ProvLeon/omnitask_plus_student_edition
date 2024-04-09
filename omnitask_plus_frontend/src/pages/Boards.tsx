@@ -149,7 +149,7 @@ const Boards = () => {
                               priority={task.priority}
                               startDate={task.start_date}
                               endDate={task.end_date}
-                              personResponsible={task.personResponsible ? {
+                              personsResponsible={task.personResponsible ? {
                                 id: task.personResponsible.id,
                                 image: task.personResponsible.image,
                                 email: task.personResponsible.email,

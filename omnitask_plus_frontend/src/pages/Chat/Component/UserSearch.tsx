@@ -1,47 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useChatContext } from 'stream-chat-react';
+import React from 'react';
 import { UserType } from '../types';
+import { Search as SearchIcon } from '@mui/icons-material';
+import { IconButton, InputAdornment, TextField } from '@mui/material';
 
-const UserSearch = () => {
-  const { client } = useChatContext();
-  const [users, setUsers] = useState<UserType[]>([]);
-  const [search, setSearch] = useState('');
+interface UserSearchProps {
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  searchResults: UserType[]; // Updated to use UserType for a more detailed type
+  loading: boolean;
+  handleUserSelection: (userId: string, checked: boolean) => void;
+}
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (search) {
-        const response = await client.queryUsers({ name: { $autocomplete: search } }, { id: 1 }, { limit: 10 });
-        if (response.users) {
-          setUsers(response.users.map(user => ({
-            ...user,
-            name: user.name || 'Unnamed User'
-          })));
-        }
-      } else {
-        setUsers([]);
-      }
-    };
-
-    const delayDebounceFn = setTimeout(() => {
-      fetchUsers();
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [search, client]);
+const UserSearch: React.FC<UserSearchProps> = ({ searchTerm, setSearchTerm, searchResults, loading, handleUserSelection }) => {
 
   return (
-    <div>
-      <input
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <TextField
         type="text"
         placeholder="Search users..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        variant="outlined"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton>
+                <SearchIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>{user.name}</li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {searchResults?.map((user) => (
+            <li key={user.id} style={{ cursor: 'pointer', padding: '10px', borderBottom: '1px solid #ccc' }} onClick={() => handleUserSelection(user.id, true)}>{user.name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

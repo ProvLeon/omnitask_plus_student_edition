@@ -24,7 +24,10 @@ import {
   MessagingSidebar,
   MessagingThreadHeader,
   SendButton,
+  UserSearch,
 } from './Chat/Component';
+import { getUserSearch } from '../utils/utils'; // Import getUserSearch from utils.tsx
+
 interface UserData {
   username: string;
   email: string;
@@ -49,8 +52,33 @@ const ChatComponent = () => {
   const { theme } = useThemeContext();
   const toggleMobile = useMobileView();
   const [channelListOptions, setChannelListOptions] = useState({filters: {}, sort: {}, options: {}})
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      setLoading(true);
+      try {
+        const { searchResults: users } = await getUserSearch(searchTerm);
+        const formattedSearchResults: UserData[] = users.map(user => ({
+          ...user,
+          contact: (user as any).contact || '' // Adapt or provide a default value for 'contact'
+        }));
+        setSearchResults(formattedSearchResults);
+      } catch (error) {
+        console.error("Failed to fetch search results:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (searchTerm) {
+      fetchSearchResults();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchTerm]);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -111,6 +139,9 @@ const ChatComponent = () => {
   return (
     <ThemeContextProvider targetOrigin='https://localhost:3000'>
         <Chat client={chatClient} theme="messaging light">
+          <div>
+            <UserSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchResults={searchResults} loading={loading} handleUserSelection={handleUserSelection} />
+          </div>
             <div className='flex flex-row h-full'>
             <div className='flex-initial w-1/3'>
 

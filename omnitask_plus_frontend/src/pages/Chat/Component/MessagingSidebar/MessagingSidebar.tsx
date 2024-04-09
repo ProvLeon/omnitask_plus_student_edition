@@ -3,6 +3,7 @@ import { ChannelList, ChannelListProps } from 'stream-chat-react';
 
 import { MessagingChannelListHeader, MessagingChannelPreview } from '../index';
 import { useThemeContext } from '../../context';
+import { UserFromToken } from 'stream-chat';
 
 type MessagingSidebarProps = {
   channelListOptions: {
@@ -13,6 +14,7 @@ type MessagingSidebarProps = {
   onClick: MouseEventHandler;
   onCreateChannel: () => void;
   onPreviewSelect: MouseEventHandler;
+  chatToken: string;
 };
 
 const MessagingSidebar = ({
@@ -30,6 +32,7 @@ const MessagingSidebar = ({
       onClick={onClick}
     >
       <MessagingChannelListHeader onCreateChannel={onCreateChannel} />
+      {/* <UserFromToken token={chatToken}/> */}
       <ChannelList
         {...channelListOptions}
         Preview={(props) => <MessagingChannelPreview {...props} onClick={onPreviewSelect} />}

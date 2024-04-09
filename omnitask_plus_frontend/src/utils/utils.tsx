@@ -1,6 +1,7 @@
 import { Avatar, Tag, Tooltip } from "antd";
 import { User } from "../components/Tasks/TaskForm";
-import { getUserData } from "../components/apis/UserApi";
+import { getAllUsers, getUserData } from "../components/apis/UserApi";
+import { useEffect, useState } from "react";
 
 const getPersonsResponsible = async (ids: string[]) => {
   const personsResponsible: User[] = []
@@ -22,61 +23,26 @@ const returnUserAvatars = async (personsResponsible: string[]) => {
     if (user) {
       users.push(user)
     }
-
   }
   console.log(users)
   if (users.length === 0) {
     return <Tag className="flex justify-center" color="blue">Null</Tag>
   }
   else if (users.length === 1) {
-
-    return <div className="flex items-center gap-2"><Avatar src={users[0].image} /><Tag color="blue">{users[0].username}</Tag></div>
-  }
-  else if (users.length === 2) {
-    console.log(users[0].id)
-    return (<Tooltip title={users[0].username + ", " + users[1].username}>
-    <div className="flex relative justify-center">
-      <div className="absolute left-3">
-      <Avatar src={users[0].image} />
-      </div>
-    <div >
-      <Avatar src={users[1].image} />
-      </div>
-      </div>
-      </Tooltip>)
-  }
-  else if (users.length === 3) {
-    console.log(users)
-    return(
-      <Tooltip title={users[0].username + ", " + users[1].username + ", " + users[2].username}>
-        <div>
-      <div className="w-10 h-10 rounded-full overflow-hidden">
-        <Avatar src={users[0].image} />
-      </div>
-        <Avatar src={users[1].image} />
-      <div className="w-10 h-10 rounded-full overflow-hidden">
-        <Avatar src={users[2].image} />
-      </div>
-      <div className="w-10 h-10 rounded-full overflow-hidden">
-        <Avatar src={users[3].image} />
-      </div>
-
-    </div>
-      </Tooltip>
-    )
+    return <div className="flex justify-center items-center gap-2"><Avatar src={users[0].image} /><Tag color="blue">{users[0].username}</Tag></div>
   }
   else {
-    return <div>
-      <Avatar src={users[0].image} />
-      <Avatar src={users[1].image} />
-      <Avatar src={users[2].image} />
-      <Avatar src={users[3].image} />
-    </div>
+    return (
+      <Tooltip title={users.map(user => user.username).join(", ")}>
+        <div className="flex justify-center items-center gap-2">
+          {users.map((user, index) => (
+            <Avatar key={user.id} src={user.image} style={{ marginLeft: index > 0 ? '-30px' : '0px', zIndex: users.length - index }} />
+          ))}
+        </div>
+      </Tooltip>
+    );
   }
 }
-
-
-
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -87,5 +53,39 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export { fileToBase64, getPersonsResponsible, returnUserAvatars };
+const getUserSearch = async (searchTerm: string) => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      const usersData = await getAllUsers();
+      if (usersData) {
+        setUsers(usersData);
+      }
+      setLoading(false);
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setSearchResults([]);
+      return;
+    }
+
+    const filteredUsers = users.filter(user =>
+      user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setSearchResults(filteredUsers);
+  }, [searchTerm, users]);
+
+  return { searchResults, loading };
+}
+
+export { fileToBase64, getPersonsResponsible, returnUserAvatars, getUserSearch };
+
 
