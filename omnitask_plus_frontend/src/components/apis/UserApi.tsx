@@ -53,6 +53,7 @@ const getUserByUsernameOrEmail = async (username?: string, email?: string): Prom
     const response = await axiosInstance.get('/', {
       params: { username, email },
     });
+    // console.log(response.data)
     return response.data;
   } catch (error) {
     throw error;
@@ -62,25 +63,41 @@ const getUserByUsernameOrEmail = async (username?: string, email?: string): Prom
 // API call to update user's data
 const updateUserData = async (userId: string, userData: any): Promise<any> => {
   try {
-    const response = await axiosInstance.put(`/update/${userId}`, userData);
+    const response = await axiosInstance.put(`/update/${userId}`, {...userData});
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-// API call to update user's profile image
-const updateUserImage = async (userId: string, imageBase64: string): Promise<any> => {
-  try {
-    const response = await axiosInstance.post(`/update_user_image`, {
-      user_id: userId,
-      image: imageBase64,
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+// // API call to update user's profile image
+// const updateUserImage = async (userId: string, imageBase64: string): Promise<any> => {
+//   try {
+//     const response = await axiosInstance.post(`/update_user_image`, {
+//       user_id: userId,
+//       image: imageBase64,
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
-export { getUserData, getAllUsers, getUserByUsernameOrEmail, updateUserData, updateUserImage };
+// const isUserOnline = async (userId: string): Promise<boolean> => {
+//   // Implementation depends on how your backend determines online status
+//   // This is a placeholder example
+//   try {
+//     const response = await fetch(`/api/users/${userId}/online-status`);
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     const { online } = await response.json();
+//     return online;
+//   } catch (error) {
+//     console.error('Failed to fetch user online status:', error);
+//     return false;
+//   }
+// };
+
+export {  getUserData, getAllUsers, getUserByUsernameOrEmail, updateUserData };
 

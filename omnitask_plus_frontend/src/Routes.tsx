@@ -3,7 +3,7 @@ import LoginPage from './pages/LoginPage';
 import Main from './components/Main';
 import Boards from './pages/Boards';
 import Tasks from './pages/Tasks';
-import Chat from './pages/Chat';
+import ChatPage from './pages/ChatPage';
 import SignUp from './components/apis/SignUp'; // Added import for SignUp
 import LandingPage from './pages/LandingPage/LandingPage'; // Added import for LandingPage
 import PassRecoveryPage from './pages/PassRecoveryPage';
@@ -22,7 +22,7 @@ const RoutesComponent = () => {
         <Route path="/boards" element={<Navigate replace to="/main/boards"/>}/>
         <Route path="/main/tasks" element={<AuthRoute element={<Tasks />} />} />
         <Route path="/tasks" element={<Navigate replace to="/main/tasks"/>}/>
-        <Route path="/main/chat" element={<AuthRoute element={<Chat />} />} />
+        <Route path="/main/chat" element={<AuthRoute element={<ChatPage />} />} />
         <Route path="/chat" element={<Navigate replace to="/main/chat"/>}/>
         <Route path="/404" element={<NotFoundPage />} />
         <Route path="*" element={<Navigate replace to="/404" />} />
