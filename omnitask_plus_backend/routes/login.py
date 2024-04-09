@@ -5,11 +5,11 @@ from flask_limiter.util import get_remote_address
 from models import User
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, verify_jwt_in_request
 from marshmallow import Schema, fields, validate
+from routes.stream_chat_api import stream_chat_client
 
 # from app import app  # This line should be removed
 
 bp = Blueprint('login', __name__, url_prefix='/api/')
-
 
 
 #  Initialize Rate Limiter
@@ -36,7 +36,9 @@ def login_user():
         if user and user.verify_password(login_data['password']):
             access_token = create_access_token(identity=str(user.id))
             refresh_token = create_refresh_token(identity=str(user.id))
-            return jsonify(access_token=access_token, refresh_token=refresh_token, user_id=user.id), 200
+            chat_token = stream_chat_client.create_token(str(user.id))
+            print(chat_token)
+            return jsonify(access_token=access_token, refresh_token=refresh_token, chat_token=chat_token, user_id=user.id), 200
         else:
             return jsonify({"error": "Invalid username or password"}), 401
     except Exception as e:

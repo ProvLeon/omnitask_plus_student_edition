@@ -4,7 +4,13 @@ from models.base_model import Base
 
 DATABASE_URI = 'sqlite:///omnitask_plus.db'
 
-engine = create_engine(DATABASE_URI, echo=True)
+engine = create_engine(
+    DATABASE_URI,
+    pool_size=20,
+    max_overflow=0,
+    pool_timeout=300,
+    echo=True
+    )
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 Base.query = session.query_property()

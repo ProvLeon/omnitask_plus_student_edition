@@ -46,15 +46,14 @@ def handle_sendMessage(data):
     receiver_socket_id = getUser(receiverId)
     if receiver_socket_id:
         emit('getMessage', {'senderId': senderId, 'text': text}, room=receiver_socket_id)
-        # Save message to database
-        new_message = Chat(sender_id=senderId, receiver_id=receiverId, text=text)  # Changed from Message to Chat
-        session.add(new_message)
-        session.commit()
-        # Emit message to both sender and receiver for real-time update
-        emit('newMessage', {'senderId': senderId, 'receiverId': receiverId, 'text': text}, room=receiver_socket_id)
-        # print('newMessage', {'senderId': senderId, 'receiverId': receiverId, 'text': text}, room=receiver_socket_id)
-        if senderId in users:
-            emit('newMessage', {'senderId': senderId, 'receiverId': receiverId, 'text': text}, room=users[senderId])
+    # Save message to database regardless of receiver being online
+    message = {'sender_id': senderId, 'receiver_id': receiverId, 'text': text}
+    new_message = Chat(**message)  # Changed from Message to Chat
+    session.add(new_message)
+    session.commit()
+    # Emit message to both sender and receiver for real-time update
+    if senderId in users:
+        emit('newMessage', {'senderId': senderId, 'receiverId': receiverId, 'text': text}, room=users[senderId])
 
 @socketio.on('getUsers')
 def handle_getUsers():
@@ -69,9 +68,15 @@ def get_messages(receiver_id):
     messages_data = [{'sender_id': message.sender_id, 'receiver_id': message.receiver_id, 'text': message.text, 'timestamp': message.timestamp} for message in messages]
     return jsonify(messages_data)
 
+@chat_bp.route('/messages', methods=['GET'])
+def get_all_messages():
+    messages = session.query(Chat).all()
+    print('messages', messages)
+    messages_data = [{'sender_id': message.sender_id, 'receiver_id': message.receiver_id, 'text': message.text, 'timestamp': message.timestamp} for message in messages]
+    return jsonify(messages_data)
+
 def init_socketio(app):
     socketio.init_app(app, cors_allowed_origins="*", logger=True, engineio_logger=True, async_mode='eventlet')
 
     with app.app_context():
         socketio.run(app, debug=True)
-

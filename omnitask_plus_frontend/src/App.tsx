@@ -12,10 +12,11 @@ const Layout = () => {
 
 
   // Always show the footer except on the LandingPage
-  const showFooter = location.pathname !== "/";
+  let showFooter = location.pathname !== "/";
   // Exclude the header on the SignUp, Login, and NotFoundPage
   const showHeader = !["/", "/signup", "/login", "/404", "/passwordrecovery"].includes(location.pathname);
 
+  showFooter = !['/main/chat'].includes(location.pathname)
 
   return (
     <>

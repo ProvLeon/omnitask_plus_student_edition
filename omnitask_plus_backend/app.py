@@ -5,12 +5,13 @@ from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from database import init_db
-from routes.chat_routes import init_socketio
+# from routes.chat_routes import init_socketio
 
 # def create_app():
 app = Flask(__name__)
 
 app.config['BASE_URL'] = 'http://localhost:5000'
+app.secret_key = os.urandom(24).hex()
 
 # Generate a random secret key
 app.config['JWT_SECRET_KEY'] = os.urandom(24).hex()
@@ -29,13 +30,15 @@ from routes.task_routes import bp as task_routes_bp
 from routes.study_sessions_routes import bp as study_sessions_routes_bp
 from routes.login import bp as login_bp
 from routes.files_route import bp as files_route_bp
-from routes.chat_routes import chat_bp as chat_route_bp
+# from routes.chat_routes import chat_bp as chat_route_bp
+from routes.stream_chat_api import stream_chat_bp as stream_chat_api_bp
 app.register_blueprint(user_routes_bp)
 app.register_blueprint(task_routes_bp)
 app.register_blueprint(study_sessions_routes_bp)
 app.register_blueprint(login_bp)
 app.register_blueprint(files_route_bp)
-app.register_blueprint(chat_route_bp)
+# app.register_blueprint(chat_route_bp)
+app.register_blueprint(stream_chat_api_bp)
 
 
 # return app
@@ -45,5 +48,5 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 if __name__ == '__main__':
     # app = create_app()
-    init_socketio(app)
+    # init_socketio(app)
     app.run()

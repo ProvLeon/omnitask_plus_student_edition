@@ -36,6 +36,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
 
   // Update progress bar color based on progress and progress category
   let progressBarColor = 'bg-gray-200'; // Default color
+  console.log(progress)
   if (progressCategory !== 'done') {
     if (progress < 30) {
       progressBarColor = 'bg-gray-200'; // Default color
@@ -50,15 +51,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
     }
   }
   let progressTextDone = '';
-  if (progressCategory === 'done') {
-    progressBarColor = 'bg-green-400';
+  if (progressCategory === 'done' && progress < 100) {
+    progressBarColor = 'bg-red-400';
     progressTextDone = 'Done';
   }
 
   return (
     <div className={`w-full ${progressBarColor} flex items-center text-center rounded-full h-1.5 dark:bg-gray-700 relative`}>
       <div className={`${progressBarColor} h-2.5 rounded-full`} style={{ width: `${progress}%` }}></div>
-      <p className={`absolute w-full text-center justify-center self-center text-[8px] text-gray-800`} style={{ left: '50%', transform: 'translateX(-50%)' }}>{progressCategory == 'done' ? progressTextDone : progressText}</p>
+      <p className={`absolute w-full text-center justify-center self-center text-[8px] text-gray-800`} style={{ left: '50%', transform: 'translateX(-50%)' }}>{ progressText}</p>
     </div>
   )
 }

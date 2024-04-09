@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { connectUser } from './ChatApi';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL +'/api'
 
@@ -11,14 +12,18 @@ const loginUser = async (credentials: { username: string; password: string }) =>
       },
     });
     // Assuming the response includes both accessToken and refreshToken
-    const { access_token, refresh_token, user_id } = response.data;
+    const { access_token, refresh_token, user_id, chat_token } = response.data;
     sessionStorage.setItem('accessToken', access_token);
     sessionStorage.setItem('refreshToken', refresh_token);
     // Store user ID in a session storage to maintain the user's session state
     sessionStorage.setItem('userId', user_id);
-    // console.log("Access Token:", access_token);
-    // console.log("Refresh Token:", refresh_token);
-    return response.data;
+    sessionStorage.setItem('chatToken', chat_token);
+    console.log("Chat Token:", chat_token);
+    // Automatically start user session upon successful login
+    if (sessionStorage.getItem('chatToken')) {
+      await connectUser();
+    }
+    // await startUserSession(user_id);
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;
@@ -29,7 +34,6 @@ const loginUser = async (credentials: { username: string; password: string }) =>
 const refreshAccessToken = async () => {
   try {
     const refreshToken = sessionStorage.getItem('refreshToken');
-    // const access_token = localStorage.getItem('accessToken');
     const response = await axios.post(`${BASE_URL}/token/refresh`, {
       headers: {
         'Content-Type': 'application/json',
@@ -46,6 +50,35 @@ const refreshAccessToken = async () => {
   }
 };
 
+// Function to automatically start user session
+// const startUserSession = async (userId: string) => {
+//   try {
+//     await axios.post(`${BASE_URL}/users/${userId}/start-session`);
+//   } catch (error) {
+//     console.error('Error starting user session:', error);
+//   }
+// };
+
+// Function to automatically end user session
+// const endUserSession = async (userId: string) => {
+//   try {
+//     await axios.post(`${BASE_URL}/users/${userId}/end-session`);
+//   } catch (error) {
+//     console.error('Error ending user session:', error);
+//   }
+// };
+
+// Function to check if user is online
+// const isUserOnline = async (userId: string) => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/users/${userId}/online-status`);
+//     return response.data.online;
+//   } catch (error) {
+//     console.error('Error checking if user is online:', error);
+//     return false;
+//   }
+// };
+
 // Axios interceptor to handle token refresh automatically
 axios.interceptors.response.use(response => response, async error => {
   // Check if the current URL is the login, register, or forgot-password page
@@ -60,6 +93,10 @@ axios.interceptors.response.use(response => response, async error => {
     const newAccessToken = await refreshAccessToken();
     if (!newAccessToken) {
       // Redirect to login if refresh token is invalid or expired
+      // const userId = sessionStorage.getItem('userId');
+      // if (userId) {
+      //   await endUserSession(userId);
+      // }
       window.location.href = '/login';
       return Promise.reject(error);
     }

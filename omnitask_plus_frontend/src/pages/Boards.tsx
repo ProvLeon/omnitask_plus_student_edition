@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getTasks, updateTaskStatus } from '../components/apis/TaskApi'; // Updated import to use updateTaskStatus
 import TaskCard from '../components/TaskCard';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Empty } from 'antd'; // Importing ant design Empty component
 
 interface BoardFrame {
   id: string;
@@ -18,9 +19,10 @@ interface Task {
   end_date: Date; // Ensure this matches the backend format "%Y-%m-%dT%H:%M:%S.%fZ"
   status: "todo" | "in progress" | "done";
   personResponsible: {
-    name: string;
+    id: string;
+    image: string;
     email: string;
-    avatar: string;
+    username: string;
   };
 }
 
@@ -113,9 +115,14 @@ const Boards = () => {
   };
 
   return (
+
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className='grid grid-cols-3 gap-4 p-4'>
-        {boardFrames.map((frame) => (
+      <div className="text-center mb-6 mt-3">
+          <h2 className="text-3xl font-bold mb-2">Task Management Board</h2>
+          <p className="text-lg">Drag & Drop tasks across different stages</p>
+        </div>
+      <div className='grid grid-cols-3 gap-4 p-4 md:w-[100vw] '>
+        {boardFrames.map((frame, index) => (
           <Droppable droppableId={frame.id} key={frame.id}>
             {(provided) => (
               <div
@@ -126,33 +133,41 @@ const Boards = () => {
                 <h1 className='text-2xl font-bold text-center'>{frame.title}</h1>
                 <hr />
                 <div className='flex flex-col gap-4 items-center'>
-                  {frame.tasks.map((task, index) => {
-                    console.log(task);
-                    return (
-                    <Draggable key={task.id} draggableId={task.id} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <TaskCard
-                            id={task.id}
-                            title={task.title}
-                            description={task.description}
-                            priority={task.priority}
-                            startDate={task.start_date}
-                            endDate={task.end_date}
-
-                            personResponsible={task.personResponsible ? { image: task.personResponsible.avatar, name: task.personResponsible.name } : undefined}
-                            progressCategory={getStatusCategory(task.status)}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                  })}
+                  {frame.tasks.length > 0 ? (
+                    frame.tasks.map((task, index) => (
+                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <TaskCard
+                              id={task.id}
+                              title={task.title}
+                              description={task.description}
+                              priority={task.priority}
+                              startDate={task.start_date}
+                              endDate={task.end_date}
+                              personResponsible={task.personResponsible ? {
+                                id: task.personResponsible.id,
+                                image: task.personResponsible.image,
+                                email: task.personResponsible.email,
+                                username: task.personResponsible.username
+                              } : undefined}
+                              progressCategory={getStatusCategory(task.status)}
+                              />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))
+                  ) : (
+                    <Empty description="No tasks created yet" />
+                    )}
                   {provided.placeholder}
+                    {/* {index === boardFrames.length - 1 && frame.tasks.length === 0 && (
+
+                    )} */}
                 </div>
               </div>
             )}

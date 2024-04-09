@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button, Modal, Box, IconButton, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent, TableSortLabel } from '@mui/material';
-import TaskForm from './TaskForm';
+import TaskForm, { User } from './TaskForm';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getTasks, deleteTask } from '../apis/TaskApi';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
+import { returnUserAvatars } from '../../utils/utils';
 
 interface Task {
   id: number;
@@ -15,6 +16,7 @@ interface Task {
   end_date: string;
   status: 'todo' | 'in progress' | 'completed';
   media?: string;
+  persons_responsible: [];
 }
 
 const priorityLevels = { 'high': 1, 'medium': 2, 'low': 3 };
@@ -35,14 +37,30 @@ const TaskUI = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isExtraSmall = useMediaQuery('(max-width:740px)');
+  const [avatars, setAvatars] = useState<{ [key: number]: JSX.Element }>({});
 
   useEffect(() => {
     const fetchTasks = async () => {
       let tasksData = await getTasks();
+      console.log(tasksData)
       setTasks(tasksData);
     };
     fetchTasks();
   }, []);
+
+  useEffect(() => {
+    const fetchAvatars = async () => {
+      const avatarsMapping: { [key: number]: JSX.Element } = {};
+      for (const task of tasks) {
+        avatarsMapping[task.id] = await returnUserAvatars(task.persons_responsible);
+      }
+      setAvatars(avatarsMapping);
+    };
+
+    if (tasks.length > 0) {
+      fetchAvatars();
+    }
+  }, [tasks]);
 
   const handleRequestSort = (property: keyof Task) => {
     const isAsc = orderBy === property && orderDirection === 'asc';
@@ -87,10 +105,11 @@ const TaskUI = () => {
     transform: 'translate(-50%, -50%)',
     width: isMobile ? '90%' : 400,
     bgcolor: 'background.paper',
-    boxShadow: 24,
+    boxShadow: 60,
     p: 4,
     overflowY: 'auto',
     maxHeight: '90vh',
+    borderRadius: '10px',
   };
 
   const isImage = (url: string) => {
@@ -100,7 +119,7 @@ const TaskUI = () => {
   const fontSizeResponsive = isMobile ? '0.7rem' : isExtraSmall ? '0.75rem' : '0.8rem';
 
   return (
-    <div>
+    <div className='w-full md:auto rounded-sm'>
       <Modal
         open={open}
         onClose={handleClose}
@@ -129,7 +148,7 @@ const TaskUI = () => {
         Create Task
       </Button>
       </Typography>
-      <Box sx={{ overflowX: 'auto', marginLeft: '5%' }}>
+      <Box sx={{  margin: '5%' }}>
         <TableContainer component={Paper} sx={{ maxHeight: '70vh', maxWidth: '100vw' }}>
           <Table sx={{ minWidth: isMobile ? 200 : 960 }} aria-label="task table" size="small" stickyHeader>
             <TableHead>
@@ -165,6 +184,9 @@ const TaskUI = () => {
                   </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>STATUS</TableCell>
+                <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>
+                  PERSON RESPONSIBLE
+                </TableCell>
                 <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>MEDIA</TableCell>
                 <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>DELETE</TableCell>
               </TableRow>
@@ -186,6 +208,7 @@ const TaskUI = () => {
                   <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.start_date)}</TableCell>
                   <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.end_date)}</TableCell>
                   <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>{task.status}</TableCell>
+                  <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>{avatars[task.id]}</TableCell>
                   <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
                     {task.media ? (
                       <Button onClick={() => task.media && handleMediaOpen(task.media)} sx={{ fontSize: fontSizeResponsive }}>View</Button>

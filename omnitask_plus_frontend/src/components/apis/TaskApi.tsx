@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { fileToBase64 } from '../../utils/utils';
+import { User } from '../Tasks/TaskForm';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL + '/tasks';
 
@@ -29,6 +30,7 @@ const getTasks = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get('/');
     const tasks = response.data.map((task: any) => {
+      // console.log(task)
       return task;
     });
     return tasks;
@@ -40,6 +42,7 @@ const getTasks = async (): Promise<any> => {
 interface TaskData {
   [key: string]: any;
   media?: File | string | null;
+  persons_responsible?:  User[];
 }
 
 

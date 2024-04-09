@@ -4,13 +4,11 @@ from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 from models.schemas import UserSchema
-from datetime import datetime
+# from datetime import datetime, timedelta
 from models.base_model import time_format, base64_to_file, delete_file
 # import base64
 
 bp = Blueprint('user_routes', __name__, url_prefix='/api/users')
-
-
 
 def check_missing_fields(user_data):
     non_nullable_fields = ['username', 'firstname', 'lastname', 'email', 'contact', 'password']
@@ -77,7 +75,6 @@ def create_user():
 def get_users():
     try:
         users = session.query(User).all()
-        # print(users.Users)
         return jsonify([user.to_dict() for user in users]), 200
     except Exception as e:
         app.logger.error(f"Error fetching users: {e}")
@@ -127,17 +124,18 @@ def update_user(user_id):
             return jsonify(error="User not found"), 404
 
         user_data = request.json
+        if not isinstance(user_data, dict):  # Ensure user_data is a dictionary
+            return jsonify({"error": "Invalid data format. Expected a JSON object."}), 400
+
         for key, value in user_data.items():
             if key == 'id':
                 continue  # Skip updating the 'id' field
             if key == 'image':
                 if user.image:
                     delete_file(user.image)
-                print(user.image)
                 value = base64_to_file(value, user_id_uuid)
             setattr(user, key, value)
 
-        # user.updated_at = datetime.now()
         session.commit()
         return jsonify(user.to_dict()), 200
     except SQLAlchemyError as e:
@@ -145,3 +143,50 @@ def update_user(user_id):
         app.logger.error(f"Failed to update user: {e}")
         return jsonify(error=str(e)), 400
 
+# # Check if a user is online
+# @bp.route('/<user_id>/online-status', methods=['GET'])
+# def check_user_online_status(user_id):
+#     try:
+#         user_id_uuid = UUID(user_id)
+#         user = session.query(User).filter(User.id == user_id_uuid).first()
+#         if user:
+#             # Check if user_id is in the active session
+#             if flask_session.get('active_users') and user.username in flask_session['active_users']:
+#                 return jsonify({"online": True}), 200
+#             else:
+#                 return jsonify({"online": False}), 200
+#         else:
+#             return jsonify(error="User not found"), 404
+#     except ValueError:
+#         return jsonify(error="Invalid UUID format"), 400
+
+# @bp.route('/<user_id>/start-session', methods=['POST'])
+# def start_user_session(user_id):
+#     try:
+#         user_id_uuid = UUID(user_id)
+#         user = session.query(User).filter(User.id == user_id_uuid).first()
+#         if user:
+#             if 'active_users' not in flask_session:
+#                 flask_session['active_users'] = []
+#             flask_session['active_users'].append(user.username)
+#             flask_session.modified = True
+#             return jsonify({"message": "User session started"}), 200
+#         else:
+#             return jsonify(error="User not found"), 404
+#     except ValueError:
+#         return jsonify(error="Invalid UUID format"), 400
+
+# @bp.route('/<user_id>/end-session', methods=['POST'])
+# def end_user_session(user_id):
+#     try:
+#         user_id_uuid = UUID(user_id)
+#         user = session.query(User).filter(User.id == user_id_uuid).first()
+#         if 'active_users' in flask_session and user.username in flask_session['active_users']:
+#             flask_session['active_users'].remove(user.username)
+#             flask_session.modified = True
+#             return jsonify({"message": "User session ended"}), 200
+#         else:
+#             return jsonify({"error": "User session not found"}), 404
+#     except Exception as e:
+#         app.logger.error(f"Failed to end user session: {e}")
+#         return jsonify(error=str(e)), 400
