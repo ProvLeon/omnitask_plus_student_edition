@@ -12,3 +12,4 @@ SQLAlchemy==2.0.28
 gunicorn==21.2.0
 python-dotenv==1.0.1
 Flask-Mail==0.9.1
+stream-chat==4.15.0
