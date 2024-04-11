@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { getTasks, updateTaskStatus } from '../components/apis/TaskApi'; // Updated import to use updateTaskStatus
 import TaskCard from '../components/TaskCard';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -10,6 +10,13 @@ interface BoardFrame {
   tasks: Task[];
 }
 
+// interface PersonResponsible  {
+//   id: string;
+//   image: string;
+//   email: string;
+//   username: string;
+//   [key: string ]: any;
+// };
 interface Task {
   id: string;
   title: string;
@@ -18,13 +25,9 @@ interface Task {
   start_date: Date; // Ensure this matches the backend format "%Y-%m-%dT%H:%M:%S.%fZ"
   end_date: Date; // Ensure this matches the backend format "%Y-%m-%dT%H:%M:%S.%fZ"
   status: "todo" | "in progress" | "done";
-  personResponsible: {
-    id: string;
-    image: string;
-    email: string;
-    username: string;
-  };
+  persons_responsible: []
 }
+
 
 const Boards = () => {
   const [boardFrames, setBoardFrames] = useState<BoardFrame[]>([]);
@@ -32,7 +35,9 @@ const Boards = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       const tasks = await getTasks();
+
       categorizeTasks(tasks);
+      console.log(tasks)
     };
     fetchTasks();
   }, []);
@@ -122,7 +127,7 @@ const Boards = () => {
           <p className="text-lg">Drag & Drop tasks across different stages</p>
         </div>
       <div className='grid grid-cols-3 gap-4 p-4 md:w-[100vw] '>
-        {boardFrames.map((frame, index) => (
+        {boardFrames.map((frame) => (
           <Droppable droppableId={frame.id} key={frame.id}>
             {(provided) => (
               <div
@@ -149,12 +154,7 @@ const Boards = () => {
                               priority={task.priority}
                               startDate={task.start_date}
                               endDate={task.end_date}
-                              personsResponsible={task.personResponsible ? [{
-                                id: task.personResponsible.id,
-                                image: task.personResponsible.image,
-                                email: task.personResponsible.email,
-                                username: task.personResponsible.username
-                              }] : undefined}
+                              personsResponsible={task.persons_responsible}
                               progressCategory={getStatusCategory(task.status)}
                               />
                           </div>

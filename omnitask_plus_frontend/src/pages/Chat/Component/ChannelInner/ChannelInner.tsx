@@ -1,4 +1,3 @@
-import React from 'react';
 import { logChatPromiseExecution } from 'stream-chat';
 import {
   MessageList,
@@ -62,9 +61,6 @@ const ChannelInner = (props: ChannelInnerProps) => {
 
   const actions = ['delete', 'edit', 'flag', 'markUnread', 'mute', 'react', 'reply'];
 
-  const renderUsername = (message) => {
-    return message.user?.name || message.user?.id;
-  };
 
   return (
     <div className='flex h-[90%] w-full'>

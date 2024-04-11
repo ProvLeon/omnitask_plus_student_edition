@@ -183,13 +183,18 @@ def update_task_attribute(task_id, attribute):
     task = session.query(Task).filter(Task.id == task_id, Task.user_id == current_user_id).first()
     if task:
         if attribute == 'persons_responsible':
-            # Update persons responsible with the provided list of user objects
-            persons_responsible_ids = [user['id'] for user in request.json['value']]
-            task.persons_responsible = session.query(User).filter(User.id.in_(persons_responsible_ids)).all()
+            try:
+                # Update persons responsible with the provided list of user objects
+                persons_responsible_ids = [uuid.UUID(id) for id in request.json['value']]
+                task.persons_responsible = session.query(User).filter(User.id.in_(persons_responsible_ids)).all()
+                # return jsonify(persons_responsible_ids), 200
+            except Exception as e:
+                return jsonify(error=f"{e} Invalid data format for persons responsible{persons_responsible_ids}"), 400
         else:
             setattr(task, attribute, request.json['value'])
         session.commit()
         return jsonify(task.to_dict()), 200
     else:
         return jsonify(error="Task not found"), 404
+
 

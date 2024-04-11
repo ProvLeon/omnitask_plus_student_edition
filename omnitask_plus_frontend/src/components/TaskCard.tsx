@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { CalendarOutlined, UserOutlined } from '@ant-design/icons'; // Importing Calendar and User icon from Ant Design
 import { Button, Card, Avatar, Tooltip, Typography, Modal, Input, List, Tag } from 'antd'; // Importing Button, Card, Avatar, Tooltip, Typography, Checkbox, Tag from Ant Design for beautification
 import { updateTaskAttribute } from './apis/TaskApi'; // Import the API call
-import { getAllUsers } from './apis/UserApi'; // Import the User API call
+import { getAllUsers, getUserData } from './apis/UserApi'; // Import the User API call
 
 interface Person {
   id: string;
@@ -38,10 +38,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [allUsers, setAllUsers] = useState<Person[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<Person[]>(personsResponsible || []);
+  const [selectedUsers, setSelectedUsers] = useState<Person[]>([]);
 
   useEffect(() => {
     setSelectedPriority(priority);
+    console.log(selectedUsers)
   }, [priority]);
 
   useEffect(() => {
@@ -62,6 +63,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     const fetchAllUsers = async () => {
       const users = await getAllUsers();
       setAllUsers(users.map((user: any) => ({ id: user.id, username: user.username, image: user.image, email: user.email })));
+
+      if (personsResponsible) {
+        const personsData = await Promise.all(personsResponsible.map((user:any) => getUserData(user)));
+        setSelectedUsers(personsData); // Directly use the fetched data
+      }
     };
     fetchAllUsers();
   }, []);
@@ -144,7 +150,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
   };
 
   const handleModalOk = async () => {
-    await updateTaskAttribute(id, 'persons_responsible', selectedUsers); // Update persons_responsible in the backend
+    await updateTaskAttribute(id, 'persons_responsible', selectedUsers.map(user => user.id)); // Update persons_responsible in the backend
     setIsUserSearchModalVisible(false); // Close the modal after selection
   };
 
@@ -233,7 +239,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
         <div className='flex items-center gap-2'>
           {selectedUsers.length > 0 ? (
             selectedUsers.map(person => (
-              <Tooltip key={person.id} title={person.username}>
+              <Tooltip key={person.id} title={`${person.username} (${person.email})`}>
                 <Avatar src={person.image} />
               </Tooltip>
             ))

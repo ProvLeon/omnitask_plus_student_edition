@@ -16,5 +16,5 @@ export type StreamChatGenerics = {
   messageType: MessageType;
   reactionType: ReactionType;
   userType: UserType;
-  // user?: UserType; // Added user property as per instructions
+  user?: UserType; // Added user property as per instructions
 };

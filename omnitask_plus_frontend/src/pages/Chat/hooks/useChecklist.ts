@@ -61,10 +61,10 @@ export const useChecklist = (chatClient: StreamChat | null, targetOrigin: string
       }
     };
 
-    if (chatClient) {
-      chatClient.on(handleNewEvent);
-    }
+    // if (chatClient) {
+    //   chatClient.on(handleNewEvent);
+    // }
 
-    return () => chatClient?.off(handleNewEvent);
+    // return () => chatClient?.off(handleNewEvent);
   }, [chatClient, targetOrigin]);
 };

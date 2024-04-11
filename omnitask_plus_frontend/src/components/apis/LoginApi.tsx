@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { connectUser } from './ChatApi';
-import { StreamChat } from 'stream-chat';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL +'/api'
-const client = await StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
 // Function to login and receive access and refresh tokens
 const loginUser = async (credentials: { username: string; password: string }) => {
   try {

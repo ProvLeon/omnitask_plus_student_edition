@@ -1,7 +1,6 @@
 import { Avatar, Tag, Tooltip } from "antd";
 import { User } from "../components/Tasks/TaskForm";
 import { getAllUsers, getUserData } from "../components/apis/UserApi";
-import { useEffect, useState } from "react";
 
 const getPersonsResponsible = async (ids: string[]) => {
   const personsResponsible: User[] = []

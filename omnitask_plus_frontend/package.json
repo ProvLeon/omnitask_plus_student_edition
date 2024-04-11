@@ -6,7 +6,7 @@
   "proxy": "http://127.0.0.1:9614",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --noEmitOnError false && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -38,6 +38,7 @@
     "react-pdf": "^7.7.1",
     "react-router-dom": "^6.22.3",
     "react-scroll": "^1.9.0",
+    "recharts": "^2.12.4",
     "socket.io-client": "^4.7.5",
     "stream-chat": "^8.25.1",
     "stream-chat-react": "^11.13.1",

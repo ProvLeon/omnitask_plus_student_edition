@@ -1,15 +1,15 @@
-import { useState, useEffect, useId } from 'react';
-import { Chat, Channel as ChannelComponent, Window, ChannelHeader, MessageList, MessageInput, ChannelList, Avatar } from 'stream-chat-react';
-import { StreamChat, Channel } from 'stream-chat';
+import { useState, useEffect } from 'react';
+import { Chat, Channel as ChannelComponent } from 'stream-chat-react';
+import { StreamChat } from 'stream-chat';
 // import { Button } from '@mui/material';
 import { EmojiPicker } from 'stream-chat-react/emojis';
 import data from '@emoji-mart/data';
 import { init, SearchIndex } from 'emoji-mart';
-import { Box } from '@mui/system';
+// import { Box } from '@mui/system';
 import 'stream-chat-react/dist/css/v2/index.css';
 import './Chat/styles/index.css'
 
-import { connectUser, initiatePrivateChat, initiateGroupChat, listAllConnectedUsers } from '../components/apis/ChatApi';
+import { connectUser } from '../components/apis/ChatApi';
 // import { getUserData } from '../components/apis/UserApi';
 // import { getChannelListOptions } from './channelListOptions';
 import { useMobileView } from './Chat/hooks'
@@ -26,47 +26,25 @@ import {
   MessagingThreadHeader,
   SendButton,
 } from './Chat/Component';
-import { getUserSearch } from '../utils/utils'; // Import getUserSearch from utils.tsx
 import { getUserData } from '../components/apis/UserApi';
 import { getChannelListOptions } from './channelListOptions';
-import { Spin } from 'antd';
 import Loading from '../components/SmallComponents/Loading';
 
-interface UserData {
-  username: string;
-  email: string;
-  id: string;
-  image: string;
-  contact: string;
-}
 
-interface ExtendedUser {
-  username: string;
-  email: string;
-  id: string;
-  image: string;
-  contact?: string;
-}
+
 
 const WrappedEmojiPicker = () => {
-  const { theme } = useThemeContext();
 
   return <EmojiPicker pickerProps={{ theme: 'light' }} />;
 };
 const ChatComponent = () => {
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
-  const [currentChannel, setCurrentChannel] = useState<Channel | undefined>(undefined);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [connectedUsers, setConnectedUsers] = useState<UserData[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const { themeClassName } = useThemeContext();
-  const { theme } = useThemeContext();
   const toggleMobile = useMobileView();
   const [channelListOptions, setChannelListOptions] = useState({filters: {}, sort: {}, options: {}})
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [searchResults, setSearchResults] = useState<UserData[]>([]);
+  // const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -75,10 +53,10 @@ const ChatComponent = () => {
       // Assuming you have a way to get the current user's ID and token
       const userId = sessionStorage.getItem('userId'); // Replace with actual user ID
       const userToken = sessionStorage.getItem('userToken'); // Replace with actual user token
-      let userData, uniqueUserId;
-      if (userId) {
-        userData = await getUserData(userId);
-      }
+      let uniqueUserId;
+      // if (userId) {
+      //   userData = await getUserData(userId);
+      // }
       if (userId && userToken) {
 
         const userData = await getUserData(userId);
@@ -113,24 +91,24 @@ const ChatComponent = () => {
     }
   }})
 
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      setLoading(true);
-      getUserSearch(searchTerm, (users) => {
-        const formattedSearchResults: UserData[] = users.map((user: ExtendedUser) => ({
-          ...user,
-          contact: user.contact || '' // Now TypeScript knows `contact` might exist
-        }));
-        setSearchResults(formattedSearchResults);
-      }, setLoading);
-    };
+  // useEffect(() => {
+  //   const fetchSearchResults = async () => {
+  //     // setLoading(true);
+  //     getUserSearch(searchTerm, (users) => {
+  //       const formattedSearchResults: UserData[] = users.map((user: ExtendedUser) => ({
+  //         ...user,
+  //         contact: user.contact || '' // Now TypeScript knows `contact` might exist
+  //       }));
+  //       // setSearchResults(formattedSearchResults);
+  //     }, setLoading);
+  //   };
 
-    if (searchTerm) {
-      fetchSearchResults();
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchTerm]);
+  //   if (searchTerm) {
+  //     fetchSearchResults();
+  //   } else {
+  //     setSearchResults([]);
+  //   }
+  // }, [searchTerm]);
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -154,7 +132,7 @@ const ChatComponent = () => {
         // Use getChannelListOptions here
         const channelList = getChannelListOptions(true, chatClient.user.id);
         setChannelListOptions(channelList)
-        const channels = await chatClient.queryChannels(channelList);
+        // const channels = await chatClient.queryChannels(channelList);
         // Assuming you have a state or method to handle the fetched channels
         // setChannels(channels);
       }
@@ -162,13 +140,13 @@ const ChatComponent = () => {
     initializeChat();
   }, []);
 
-  const handleUserSelection = (userId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedUsers(prevSelectedUsers => [...prevSelectedUsers, userId]);
-    } else {
-      setSelectedUsers(prevSelectedUsers => prevSelectedUsers.filter(id => id !== userId));
-    }
-  };
+  // const handleUserSelection = (userId: string, checked: boolean) => {
+  //   if (checked) {
+  //     setSelectedUsers(prevSelectedUsers => [...prevSelectedUsers, userId]);
+  //   } else {
+  //     setSelectedUsers(prevSelectedUsers => prevSelectedUsers.filter(id => id !== userId));
+  //   }
+  // };
 
   if (!chatClient) {
     return <Loading/>
