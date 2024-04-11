@@ -46,7 +46,7 @@ const MessagingChannelHeader = (props: Props) => {
   useEffect(() => {
     if (!channelName) {
       setTitle(
-        members.map((member) => member.user?.name || member.user?.id || 'Unnamed User').join(', '),
+        members.map((member) => member.user?.username || member.user?.id || 'Unnamed User').join(', '),
       );
     }
   }, [channelName, members]);
@@ -61,7 +61,7 @@ const MessagingChannelHeader = (props: Props) => {
     >
       <input
         autoFocus
-        className='channel-header__edit-input'
+        className='rounded-md focus:outline-slate-100  outline-none p-0 bg-none text-gray-800 font-helvetica font-neue font-sans font-[17px] channel-header__edit-input'
         onBlur={updateChannel}
         onChange={(event) => setChannelName(event.target.value)}
         placeholder='Type a new name for the chat'

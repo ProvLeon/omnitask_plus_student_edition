@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { connectUser } from './ChatApi';
+import { StreamChat } from 'stream-chat';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL +'/api'
-
+const client = await StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
 // Function to login and receive access and refresh tokens
 const loginUser = async (credentials: { username: string; password: string }) => {
   try {
@@ -20,8 +21,11 @@ const loginUser = async (credentials: { username: string; password: string }) =>
     sessionStorage.setItem('chatToken', chat_token);
     console.log("Chat Token:", chat_token);
     // Automatically start user session upon successful login
-    if (sessionStorage.getItem('chatToken')) {
-      await connectUser();
+    if (sessionStorage.getItem('chatToken') && location.pathname === '/chat') {
+      console.log("Connecting user...")
+      const user = await connectUser();
+      console.log(user)
+      console.log("User connected successfully.")
     }
     // await startUserSession(user_id);
   } catch (error) {

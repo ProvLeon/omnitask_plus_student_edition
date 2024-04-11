@@ -2,30 +2,42 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Avatar, useChatContext } from 'stream-chat-react';
 import type { UserResponse } from 'stream-chat';
 import _debounce from 'lodash.debounce';
+// import UserData from '../../../ChatPage'
 
 import { XButton, XButtonBackground } from '../../assets';
 
 import './CreateChannel.css';
 
 import type { StreamChatGenerics } from '../../types';
+// import { getUserData } from '../../../../components/apis/UserApi';
+import { listAllConnectedUsers } from '../../../../components/apis/ChatApi';
+
+
+interface UserData {
+  username: string;
+  email: string;
+  id: string;
+  image: string;
+  contact: string;
+}
 
 const UserResult = ({ user }: { user: UserResponse<StreamChatGenerics> }) => (
   <li className='flex items-center gap-4 h-14 cursor-pointer p-2'>
-    <Avatar image={user.image} name={user.name} size={40} />
+    <Avatar image={user.image} name={user.username} size={40} />
     {user.online && <div className='absolute right-7 bottom-3.5 bg-green-500 rounded-full h-4 w-4 border-2 border-white dark:border-gray-800' />}
     <div className='flex flex-col'>
-      <span>{user.name}</span>
+      <span>{user.username}</span>
     </div>
   </li>
 );
 
 type Props = {
   onClose: () => void;
-  toggleMobile: () => void;
+  // toggleMobile: () => void;
 };
 
 const CreateChannel = (props: Props) => {
-  const { onClose, toggleMobile } = props;
+  const { onClose } = props;
 
   const { client, setActiveChannel } = useChatContext<StreamChatGenerics>();
 
@@ -60,20 +72,41 @@ const CreateChannel = (props: Props) => {
     setSearching(true);
 
     try {
-      const response = await client.queryUsers(
-        {
-          id: { $ne: client.userID as string },
-          $and: [{ name: { $autocomplete: inputText } }],
-        },
-        { id: 1 },
-        { limit: 6 },
-      );
+      // const response = await client.queryUsers({
+        // {
+        //   id: { $ne: client.userID as string },
+        //   $and: [{ name: { $autocomplete: inputText } }],
+        // },
+        // { id: 1 },
+        // { limit: 8 },
+      //   role: { $in: ['user', 'moderator'] },
+      //   $or: [
+      //     { name: { $autocomplete: inputText } },
+      //     { username: { $autocomplete: inputText } as any }
+      //     ],
+      //   },
+      //   { id: 1 },
+      //   { limit: 8 },
+      // );
+      // console.log("response", response)
+      // const userData = await getUserData(client.userID as string);
+        // setUserData(userData);
+        const users = await listAllConnectedUsers(inputText);
+        console.log('lomotey', users)
+        const formattedUsers: UserData[] = (users || []).map(user => ({
+          username: user.username as string,
+          email: user.email as string,
+          id: user.id,
+          image: user.image as string,
+          contact: user.contact as string
+        }));
+        console.log(formattedUsers)
 
-      if (!response.users.length) {
+      if (!formattedUsers.length) {
         setSearchEmpty(true);
       } else {
         setSearchEmpty(false);
-        setUsers(response.users);
+        setUsers(formattedUsers);
       }
 
       setResultsOpen(true);
@@ -176,7 +209,7 @@ const CreateChannel = (props: Props) => {
                     onClick={() => removeUser(user)}
                     key={user.id}
                   >
-                    <div className='text-sm mr-2'>{user.name}</div>
+                    <div className='text-sm mr-2'>{user.username}</div>
                     <XButton />
                   </div>
                 ))}
@@ -194,7 +227,7 @@ const CreateChannel = (props: Props) => {
               />
             </form>
           </div>
-          <div className='ml-2 cursor-pointer' onClick={() => toggleMobile()}>
+          <div className='ml-2 cursor-pointer' onClick={() => onClose()}>
             <XButtonBackground />
           </div>
         </div>

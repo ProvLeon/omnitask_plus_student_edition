@@ -6,7 +6,7 @@ export type CommandType = LiteralStringForUnion;
 export type EventType = {};
 export type MessageType = {};
 export type ReactionType = {};
-export type UserType = { id: string; name: string; image?: string };
+export type UserType = { id: string; username: string; image?: string };
 
 export type StreamChatGenerics = {
   attachmentType: AttachmentType;
@@ -16,5 +16,5 @@ export type StreamChatGenerics = {
   messageType: MessageType;
   reactionType: ReactionType;
   userType: UserType;
-  user?: UserType; // Added user property as per instructions
+  // user?: UserType; // Added user property as per instructions
 };

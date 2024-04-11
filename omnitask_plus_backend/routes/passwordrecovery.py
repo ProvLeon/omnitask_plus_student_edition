@@ -1,20 +1,22 @@
-from flask import Blueprint, request, jsonify
+from flask import Flask, Blueprint, request, jsonify
 from database import session
 from models.user import User
 from werkzeug.security import generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from flask_mail import Message, Mail
+from flask_mail import Message
+from utils.extensions import mail
+import os
+# from app import mail
 
 bp = Blueprint('password_recovery', __name__, url_prefix='/users')
 
 # Initialize Flask-Mail
-mail = Mail()
 
 # Serializer for generating and confirming tokens
 serializer = URLSafeTimedSerializer('ThisIsASecret!')
 
 # Store the frontend link in a variable
-frontend_url = 'http://localhost:3000'
+frontend_url = os.getenv('FRONTEND_URL')
 
 @bp.route('/request-password-recovery', methods=['POST'])
 def request_password_recovery():
@@ -31,7 +33,7 @@ def request_password_recovery():
     recovery_link = f'{frontend_url}/recover-password/{token}'
 
     # Send recovery email
-    msg = Message('Password Recovery Request', sender='noreply@omnitask.com', recipients=[email])
+    msg = Message('Password Recovery Request', sender='leoTech-digital@gmail.com', recipients=[email])
     msg.body = f"""Hello,
 
 You recently requested to reset your password for your OmniTask+ account. Use the link below to reset it. This password reset is only valid for the next 60 minutes.

@@ -18,9 +18,9 @@ const MessagingChannelListHeader = React.memo((props: Props) => {
   const { id, image = streamLogo as string, username = 'Example User' } = client.user || {};
 
   return (
-      <div className='flex p-4 items-center justify-between'>
+      <div className='flex p-4 items-center justify-between bg-gray-400 h-20'>
         <div className='flex items-center'>
-          <div className='w-10 h-10 rounded-full border border-gray-400 overflow-hidden'>
+          <div className='w-10 h-10 rounded-full border border-gray-900 overflow-hidden'>
             <Avatar image={image} name={username} size={40} />
           </div>
           <div className={`messaging__channel-list__header__name ml-4`}>{username || id}</div>

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import RoutesComponent from "./Routes";
 import Footer from "./components/Footer";
 import NaviBar from "./components/Tasks/NaviBar";
-import { ChatProvider } from "./contexts/ChatContext";
 // import { pdfjs } from 'react-pdf';
 
 // pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';

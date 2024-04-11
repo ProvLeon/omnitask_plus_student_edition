@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios'; // Assuming axios is used for HTTP requests
-
+import { Spin } from 'antd'; // Importing Spin component from Ant Design for loading animation
+import Loading from '../SmallComponents/Loading';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL
 
@@ -39,7 +40,9 @@ const AuthRoute = ({ element: Component }: AuthRouteProps) => {
   }, []);
 
   if (isAuth === null) {
-    return <div>Loading...</div>; // Or any other loading indicator
+    return (
+     <Loading/>
+    ); // Using Ant Design's Spin component for a professional and colorful loading animation
   }
 
   return isAuth ? Component : <Navigate to="/login" state={{ from: "location" }} />;

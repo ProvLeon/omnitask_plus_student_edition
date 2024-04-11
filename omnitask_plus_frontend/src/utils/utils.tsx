@@ -53,39 +53,18 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-const getUserSearch = async (searchTerm: string) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      const usersData = await getAllUsers();
-      if (usersData) {
-        setUsers(usersData);
-      }
-      setLoading(false);
-    };
-
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (!searchTerm) {
-      setSearchResults([]);
-      return;
-    }
-
-    const filteredUsers = users.filter(user =>
+const getUserSearch = async (searchTerm: string, onResults: (results: User[]) => void, onLoading: (isLoading: boolean) => void) => {
+  onLoading(true);
+  const usersData = await getAllUsers();
+  let filteredUsers: User[] = [];
+  if (usersData) {
+    filteredUsers = usersData.filter((user: User) =>
       user.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setSearchResults(filteredUsers);
-  }, [searchTerm, users]);
-
-  return { searchResults, loading };
-}
+  }
+  onResults(filteredUsers);
+  onLoading(false);
+};
 
 export { fileToBase64, getPersonsResponsible, returnUserAvatars, getUserSearch };
-
 

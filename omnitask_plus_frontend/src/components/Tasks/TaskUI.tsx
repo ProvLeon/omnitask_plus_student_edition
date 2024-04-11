@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { getTasks, deleteTask } from '../apis/TaskApi';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import { returnUserAvatars } from '../../utils/utils';
+import { Empty } from 'antd'; // Importing ant design Empty component for beautiful no tasks animation
 
 interface Task {
   id: number;
@@ -118,115 +119,131 @@ const TaskUI = () => {
 
   const fontSizeResponsive = isMobile ? '0.7rem' : isExtraSmall ? '0.75rem' : '0.8rem';
 
+  const taskForm = () => {
+    return (
+      <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="create-task-modal-title"
+            aria-describedby="create-task-form"
+          >
+            <Box sx={modalStyle}>
+              <IconButton
+                aria-label="close"
+                onClick={handleClose}
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <TaskForm />
+            </Box>
+          </Modal>
+    )
+  }
+
+
   return (
     <div className='w-full md:auto rounded-sm'>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="create-task-modal-title"
-        aria-describedby="create-task-form"
-      >
-        <Box sx={modalStyle}>
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <TaskForm />
-        </Box>
-      </Modal>
-      <Typography variant={isMobile ? "h6" : "h4"} sx={{ mt: 5, mb: 2, textAlign: 'center' }}>
-        Tasks
-        <Button variant="contained" onClick={handleOpen} sx={{ ml: 2, mb: 2, alignSelf: 'center', fontSize: fontSizeResponsive }}>
-        Create Task
-      </Button>
-      </Typography>
-      <Box sx={{  margin: '5%' }}>
-        <TableContainer component={Paper} sx={{ maxHeight: '70vh', maxWidth: '100vw' }}>
-          <Table sx={{ minWidth: isMobile ? 200 : 960 }} aria-label="task table" size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontSize: fontSizeResponsive }}>#</TableCell>
-                <TableCell sx={{ fontSize: fontSizeResponsive }}>Title</TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
-                  <TableSortLabel
-                    active={orderBy === 'priority'}
-                    direction={orderBy === 'priority' ? orderDirection : 'asc'}
-                    onClick={() => handleRequestSort('priority')}
-                  >
-                    PRIORITY
-                  </TableSortLabel>
-                </TableCell>
-                {isMobile ? null : <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>DESCRIPTION</TableCell>}
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
-                  <TableSortLabel
-                    active={orderBy === 'start_date'}
-                    direction={orderBy === 'start_date' ? orderDirection : 'asc'}
-                    onClick={() => handleRequestSort('start_date')}
-                  >
-                    START DATE
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
-                  <TableSortLabel
-                    active={orderBy === 'end_date'}
-                    direction={orderBy === 'end_date' ? orderDirection : 'asc'}
-                    onClick={() => handleRequestSort('end_date')}
-                  >
-                    END DATE
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>STATUS</TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>
-                  PERSON RESPONSIBLE
-                </TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>MEDIA</TableCell>
-                <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>DELETE</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedTasks.map((task, index) => (
-                <TableRow
-                  key={task.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, border: 1, borderColor: 'divider' }}
-                >
-                  <TableCell component="th" scope="row" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>
-                    {index + 1}
-                  </TableCell>
-                  <TableCell sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>
-                    {task.title}
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{task.priority}</TableCell>
-                  {isMobile ? null : <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{task.description}</TableCell>}
-                  <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.start_date)}</TableCell>
-                  <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.end_date)}</TableCell>
-                  <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>{task.status}</TableCell>
-                  <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>{avatars[task.id]}</TableCell>
-                  <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
-                    {task.media ? (
-                      <Button onClick={() => task.media && handleMediaOpen(task.media)} sx={{ fontSize: fontSizeResponsive }}>View</Button>
-                    ) : (
-                      <Typography sx={{ fontSize: fontSizeResponsive }}>No Media</Typography>
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={() => handleDeleteTask(task.id)} sx={{ fontSize: fontSizeResponsive }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+      {tasks.length === 0 ? (
+        <>
+        <Empty description={<span>No tasks, <Button onClick={handleOpen} variant="contained">Create Task</Button></span>} />
+        {taskForm()}
+        </>
+      ) : (
+        <>
+        {taskForm()}
+          <Typography variant={isMobile ? "h6" : "h4"} sx={{ mt: 5, mb: 2, textAlign: 'center' }}>
+            Tasks
+            <Button variant="contained" onClick={handleOpen} sx={{ ml: 2, mb: 2, alignSelf: 'center', fontSize: fontSizeResponsive }}>
+            Create Task
+          </Button>
+          </Typography>
+          <Box sx={{  margin: '5%' }}>
+            <TableContainer component={Paper} sx={{ maxHeight: '70vh', maxWidth: '100vw' }}>
+              <Table sx={{ minWidth: isMobile ? 200 : 960 }} aria-label="task table" size="small" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontSize: fontSizeResponsive }}>#</TableCell>
+                    <TableCell sx={{ fontSize: fontSizeResponsive }}>Title</TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
+                      <TableSortLabel
+                        active={orderBy === 'priority'}
+                        direction={orderBy === 'priority' ? orderDirection : 'asc'}
+                        onClick={() => handleRequestSort('priority')}
+                      >
+                        PRIORITY
+                      </TableSortLabel>
+                    </TableCell>
+                    {isMobile ? null : <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>DESCRIPTION</TableCell>}
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
+                      <TableSortLabel
+                        active={orderBy === 'start_date'}
+                        direction={orderBy === 'start_date' ? orderDirection : 'asc'}
+                        onClick={() => handleRequestSort('start_date')}
+                      >
+                        START DATE
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
+                      <TableSortLabel
+                        active={orderBy === 'end_date'}
+                        direction={orderBy === 'end_date' ? orderDirection : 'asc'}
+                        onClick={() => handleRequestSort('end_date')}
+                      >
+                        END DATE
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>STATUS</TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>
+                      PERSON RESPONSIBLE
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>MEDIA</TableCell>
+                    <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>DELETE</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedTasks.map((task, index) => (
+                    <TableRow
+                      key={task.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, border: 1, borderColor: 'divider' }}
+                    >
+                      <TableCell component="th" scope="row" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>
+                        {task.title}
+                      </TableCell>
+                      <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{task.priority}</TableCell>
+                      {isMobile ? null : <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{task.description}</TableCell>}
+                      <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.start_date)}</TableCell>
+                      <TableCell align="right" sx={{ borderRight: 1, borderColor: 'divider', fontSize: fontSizeResponsive }}>{formatDate(task.end_date)}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>{task.status}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: fontSizeResponsive, backgroundColor: '' }}>{avatars[task.id]}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: fontSizeResponsive }}>
+                        {task.media ? (
+                          <Button onClick={() => task.media && handleMediaOpen(task.media)} sx={{ fontSize: fontSizeResponsive }}>View</Button>
+                        ) : (
+                          <Typography sx={{ fontSize: fontSizeResponsive }}>No Media</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton onClick={() => handleDeleteTask(task.id)} sx={{ fontSize: fontSizeResponsive }}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </>
+      )}
       <Dialog open={mediaOpen} onClose={handleMediaClose}>
         <DialogTitle sx={{ fontSize: fontSizeResponsive }}>Task Media</DialogTitle>
         <DialogContent>
@@ -256,3 +273,4 @@ const TaskUI = () => {
 }
 
 export default TaskUI
+

@@ -25,23 +25,23 @@ body {
     background: var(--str-chat__background-color);
 }
 
-*::-webkit-scrollbar {
+/* *::-webkit-scrollbar {
     width: 0.3rem;
-}
+} */
 
-*::-webkit-scrollbar-thumb {
+/* *::-webkit-scrollbar-thumb {
     background-color: darkgrey;
     border-radius: 2px;
-}
+} */
 
-body::-webkit-scrollbar {
+/* body::-webkit-scrollbar {
     background: transparent;
-}
+} */
 
-body::-webkit-scrollbar-track {
+/* body::-webkit-scrollbar-track {
     background: transparent;
-}
+} */
 
-body::-webkit-scrollbar-thumb {
+/* body::-webkit-scrollbar-thumb {
     background-color: transparent;
-}
+} */

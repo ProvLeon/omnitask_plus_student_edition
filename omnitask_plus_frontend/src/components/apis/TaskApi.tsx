@@ -29,10 +29,8 @@ axiosInstance.interceptors.request.use((config) => {
 const getTasks = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get('/');
-    const tasks = response.data.map((task: any) => {
-      // console.log(task)
-      return task;
-    });
+    // Ensure response.data is an array before mapping
+    const tasks = Array.isArray(response.data) ? response.data.map((task: any) => task) : [];
     return tasks;
   } catch (error) {
     throw error;

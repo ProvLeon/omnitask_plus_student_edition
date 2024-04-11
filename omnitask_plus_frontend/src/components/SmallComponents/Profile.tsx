@@ -6,7 +6,7 @@ import { Theme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { publish } from '../../utils/pubSub'; // Adjust the path as necessary
-import { getUserData, updateUserData, updateUserImage } from '../apis/UserApi';
+import { getUserData, updateUserData } from '../apis/UserApi';
 
 
 const Item = styled(Paper)(({ theme }: { theme: Theme }) => ({

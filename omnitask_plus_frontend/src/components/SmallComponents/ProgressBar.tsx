@@ -33,6 +33,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
 
   const progress = calculateProgress();
   const progressText = `${progress.toPrecision(3)}%`;
+  let progressTextDone = '';
 
   // Update progress bar color based on progress and progress category
   let progressBarColor = 'bg-gray-200'; // Default color
@@ -50,7 +51,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
       progressBarColor = 'bg-red-500';
     }
   }
-  let progressTextDone = '';
   if (progressCategory === 'done' && progress < 100) {
     progressBarColor = 'bg-red-400';
     progressTextDone = 'Done';

@@ -149,12 +149,12 @@ const Boards = () => {
                               priority={task.priority}
                               startDate={task.start_date}
                               endDate={task.end_date}
-                              personsResponsible={task.personResponsible ? {
+                              personsResponsible={task.personResponsible ? [{
                                 id: task.personResponsible.id,
                                 image: task.personResponsible.image,
                                 email: task.personResponsible.email,
                                 username: task.personResponsible.username
-                              } : undefined}
+                              }] : undefined}
                               progressCategory={getStatusCategory(task.status)}
                               />
                           </div>

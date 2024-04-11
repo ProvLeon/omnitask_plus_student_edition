@@ -12,7 +12,7 @@ export const TypingIndicator = () => {
 
   const users = Object.values(typing)
     .filter(({ user }) => user?.id !== client.user?.id)
-    .map(({ user }) => user?.name || user?.id);
+    .map(({ user }) => user?.username || user?.id);
 
   let text = '';
 

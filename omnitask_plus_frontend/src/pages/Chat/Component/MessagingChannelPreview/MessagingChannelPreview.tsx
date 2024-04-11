@@ -38,10 +38,10 @@ const getChannelName = (members: ChannelMemberResponse[]) => {
   const defaultName = 'Johnny Blaze';
 
   if (!members.length || members.length === 1) {
-    return members[0]?.user?.name || defaultName;
+    return members[0]?.user?.username || defaultName;
   }
 
-  return `${members[0]?.user?.name || defaultName}, ${members[1]?.user?.name || defaultName}`;
+  return `${members[0]?.user?.username || defaultName}, ${members[1]?.user?.username || defaultName}`;
 };
 
 type MessagingChannelPreviewProps = ChannelPreviewUIComponentProps & {
@@ -71,9 +71,9 @@ const MessagingChannelPreview = (props: MessagingChannelPreviewProps) => {
       }}
     >
       <AvatarGroup members={members} />
-      <div className='flex flex-col ml-2 mr-2 w-full'>
-        <div className='flex'>
-          <p className=' text-sm font-bold text-black flex-grow truncate'>
+      <div className='flex flex-col ml-2 mr-2 md:w-full w-auto'>
+        <div className='flex gap-5 sm:gap-10 md:gap-auto'>
+          <p className=' text-sm font-bold text-black md:flex-grow  truncate'>
             {channel.data?.name || getChannelName(members)}
           </p>
           <p className='text-xs text-gray-500'>{getTimeStamp(channel)}</p>
