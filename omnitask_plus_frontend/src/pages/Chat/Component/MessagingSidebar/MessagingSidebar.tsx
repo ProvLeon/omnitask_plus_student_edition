@@ -36,7 +36,7 @@ const MessagingSidebar = ({
       {/* <UserSearch /> */}
       <ChannelList
         {...channelListOptions}
-        Preview={(props) => <MessagingChannelPreview {...props} onClick={onPreviewSelect} />}
+        Preview={(props: any) => <MessagingChannelPreview {...props} onClick={onPreviewSelect} />}
       />
     </div>
   );

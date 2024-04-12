@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button, Modal, Box, IconButton, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent, TableSortLabel } from '@mui/material';
-import TaskForm, { User } from './TaskForm';
+import TaskForm from './TaskForm';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getTasks, deleteTask } from '../apis/TaskApi';
@@ -77,9 +77,11 @@ const TaskUI = () => {
       } else if (orderBy === 'status') {
         comparison = a.status.localeCompare(b.status);
       } else {
-        const aValue = a[orderBy] || '';
-        const bValue = b[orderBy] || '';
-        comparison = new Date(aValue).getTime() - new Date(bValue).getTime();
+        const aValue = typeof a[orderBy] === 'string' || typeof a[orderBy] === 'number' ? a[orderBy] : '';
+        const bValue = typeof b[orderBy] === 'string' || typeof b[orderBy] === 'number' ? b[orderBy] : '';
+        if (aValue && bValue) {
+          comparison = new Date(aValue.toString() || '').getTime() - new Date(bValue.toString() || '').getTime();
+        }
       }
       return orderDirection === 'asc' ? comparison : -comparison;
     });

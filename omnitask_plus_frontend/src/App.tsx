@@ -2,6 +2,8 @@ import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import RoutesComponent from "./Routes";
 import Footer from "./components/Footer";
 import NaviBar from "./components/Tasks/NaviBar";
+import { ErrorBoundary } from "./utils/ErrorBoundaryState";
+
 // import { pdfjs } from 'react-pdf';
 
 // pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -15,11 +17,11 @@ const Layout = () => {
   // Exclude the header on the SignUp, Login, and NotFoundPage
   const showHeader = !["/", "/signup", "/login", "/404", "/passwordrecovery"].includes(location.pathname);
 
-  showFooter = !['/main/chat'].includes(location.pathname)
+  showFooter = !['/main/chat', '/main'].includes(location.pathname)
 
   return (
     <>
-      {showHeader && <NaviBar />}
+      {showHeader && <ErrorBoundary><NaviBar /></ErrorBoundary>}
       <RoutesComponent />
       {showFooter && <Footer />}
     </>

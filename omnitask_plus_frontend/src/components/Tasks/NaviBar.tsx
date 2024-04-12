@@ -1,16 +1,41 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { IconButton, Menu, MenuItem, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Menu, MenuItem, useMediaQuery, useTheme, Dialog, DialogTitle, List, ListItem, ListItemText, ListItemAvatar, Avatar as MuiAvatar } from '@mui/material';
 import { Menu as MenuIcon, NotificationsOutlined, Close } from '@mui/icons-material';
 import Profile from '../SmallComponents/Profile';
 import { getUserData } from '../apis/UserApi';
 import { subscribe } from '../../utils/pubSub';
 import PomodoroTimer from '../SmallComponents/PomodoroTimer';
 import logo from '../../assets/omniTaskplusbgwhite.png'
+import { Avatar } from 'antd';
+import { DefaultStreamChatGenerics, useChatContext } from 'stream-chat-react';
+import { Event } from 'stream-chat';
 
 interface ProfileData {
   username: string;
   image: string;
+}
+
+interface Message {
+  id: string;
+  text: string;
+  sender: { id: string; name: string; avatar: string };
+  receiver: { id: string };
+}
+
+interface ExtendedMessageEvent {
+  message: {
+    id: string;
+    text: string;
+    user: {
+      id: string;
+      name?: string;
+      image?: string;
+    };
+    receiver: {
+      id: string;
+    };
+  };
 }
 
 const NaviBar = () => {
@@ -18,11 +43,18 @@ const NaviBar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState<null | HTMLElement>(null);
   const profileRef = useRef(null);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [showMessages, setShowMessages] = useState(false);
 
   const [profileData, setProfileData] = useState({
     username: '',
     image: '',
   });
+
+  const { client } = useChatContext();
+  const user = client.user;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,8 +99,40 @@ const NaviBar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const messageHandler = (event: Event<DefaultStreamChatGenerics>) => {
+      const extendedEvent = event as unknown as ExtendedMessageEvent; // Type assertion
+      if (user && extendedEvent.message && extendedEvent.message.user && extendedEvent.message.user.id !== user.id && extendedEvent.message.receiver.id === user.id) {
+        const adaptedMessage: Message = {
+          id: extendedEvent.message.id,
+          text: extendedEvent.message.text || '',
+          sender: {
+            id: extendedEvent.message.user?.id || '',
+            name: extendedEvent.message.user?.name || '',
+            avatar: extendedEvent.message.user?.image || '',
+          },
+          receiver: {
+            id: user.id,
+          },
+        };
+        setMessages(prevMessages => [...prevMessages, adaptedMessage]);
+        setNewMessageCount(prevCount => prevCount + 1);
+      }
+    };
+
+    if (client) {
+      client.on('message.new', messageHandler);
+    }
+
+    return () => {
+      if (client) {
+        client.off('message.new', messageHandler);
+      }
+    };
+  }, [client, user?.id]);
 
   const handleProfileClick = () => {
+    // if (!user) return; // Add this line to guard against undefined user
     setShowProfile(!showProfile);
     document.body.style.overflow = showProfile ? 'auto' : 'hidden';
   };
@@ -86,6 +150,15 @@ const NaviBar = () => {
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMobileMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClick = () => {
+    setShowMessages(true);
+  };
+
+  const handleNavigateToChat = (messageId: string) => {
+    navigate(`/chat/${messageId}`);
+    setShowMessages(false);
   };
 
   const theme = useTheme();
@@ -107,12 +180,28 @@ const NaviBar = () => {
 
   const renderNotification = (
     <div className='flex items-center gap-2'>
-      <div className='relative cursor-pointer mr-2'>
-        <span className='absolute right-0 top-0 rounded-full w-4 h-4 text-center bg-red-500 text-white text-xs'>3</span>
+      <div className='relative cursor-pointer mr-2' onClick={handleNotificationClick}>
+        <span className='absolute right-0 top-0 rounded-full w-4 h-4 text-center bg-red-500 text-white text-xs'>{newMessageCount}</span>
         <NotificationsOutlined className='text-gray-800 dark:text-white w-10 h-10'/>
       </div>
     </div>
-  )
+  );
+
+  const renderMessagesDialog = (
+    <Dialog onClose={() => setShowMessages(false)} open={showMessages} fullWidth>
+      <DialogTitle>Messages</DialogTitle>
+      <List>
+        {messages.map((message) => (
+          <ListItem button onClick={() => handleNavigateToChat(message.id)} key={message.id}>
+            <ListItemAvatar>
+              <MuiAvatar src={message.sender.avatar} />
+            </ListItemAvatar>
+            <ListItemText primary={message.sender.name} secondary={message.text} />
+          </ListItem>
+        ))}
+      </List>
+    </Dialog>
+  );
 
   return (
     <Fragment>
@@ -129,7 +218,7 @@ const NaviBar = () => {
               <PomodoroTimer className={`justify-self-center self-center ${scrolled ? 'mr-10' : 'mr-16'}`}/>
               <div className='flex items-center gap-2'>
                 {renderNotification}
-              <img src={profileData.image} alt="Profile" className="w-8 h-8 rounded-full mr-2" onClick={handleProfileClick}/>
+              <Avatar src={profileData.image} alt="Profile" className="w-8 h-8 rounded-full mr-2" onClick={handleProfileClick}/>
               </div>
               {renderMobileMenu}
             </div>
@@ -144,7 +233,7 @@ const NaviBar = () => {
               <div className="flex items-center ml-4">
                 {renderNotification}
                 <div id="profile" className="flex items-center cursor-pointer" onClick={handleProfileClick} ref={profileRef}>
-                  <img src={profileData.image} alt="Profile" className="w-8 h-8 rounded-full mx-2"/>
+                  <Avatar src={profileData.image} alt="Profile" className="w-8 h-8 rounded-full mx-2"/>
                   { !isMobile && <span className="text-sm text-gray-800 dark:text-white">{profileData.username}</span> }
                 </div>
               </div>
@@ -160,6 +249,7 @@ const NaviBar = () => {
           <Profile />
         </div>
       </div>}
+      {renderMessagesDialog}
     </Fragment>
   )
 }

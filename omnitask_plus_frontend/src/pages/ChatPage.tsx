@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Chat, Channel as ChannelComponent } from 'stream-chat-react';
+import { Channel as ChannelComponent } from 'stream-chat-react';
 import { StreamChat } from 'stream-chat';
 // import { Button } from '@mui/material';
 import { EmojiPicker } from 'stream-chat-react/emojis';
@@ -13,7 +13,7 @@ import { connectUser } from '../components/apis/ChatApi';
 // import { getUserData } from '../components/apis/UserApi';
 // import { getChannelListOptions } from './channelListOptions';
 import { useMobileView } from './Chat/hooks'
-import { GiphyContextProvider, ThemeContextProvider, useThemeContext } from './Chat/context';
+import { GiphyContextProvider, useThemeContext } from './Chat/context';
 
 
 // const client = StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
@@ -29,9 +29,10 @@ import {
 import { getUserData } from '../components/apis/UserApi';
 import { getChannelListOptions } from './channelListOptions';
 import Loading from '../components/SmallComponents/Loading';
+// import { StreamChatGenerics } from './Chat/types';
 
 
-
+export let useChatClient: StreamChat;
 
 const WrappedEmojiPicker = () => {
 
@@ -82,6 +83,10 @@ const ChatComponent = () => {
 
             setChatClient(client);
           };
+        }
+        if (chatClient){
+
+          useChatClient = chatClient
         }
 
     initChat();
@@ -153,8 +158,8 @@ const ChatComponent = () => {
   }
 
   return (
-    <ThemeContextProvider targetOrigin='https://localhost:5000'>
-        <Chat client={chatClient} theme="messaging light">
+    <div className='h-[100%]'>
+
           <div>
               {isCreating && (<div className=' bg-transparent z-10'>
 
@@ -189,8 +194,8 @@ const ChatComponent = () => {
       </ChannelComponent>
           </div>
           </div>
-        </Chat>
-      </ThemeContextProvider>
+      </div>
+
 
   );
 };

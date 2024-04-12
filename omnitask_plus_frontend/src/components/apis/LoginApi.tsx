@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { connectUser } from './ChatApi';
+import { Navigate } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL +'/api'
 // Function to login and receive access and refresh tokens
@@ -17,7 +18,7 @@ const loginUser = async (credentials: { username: string; password: string }) =>
     // Store user ID in a session storage to maintain the user's session state
     sessionStorage.setItem('userId', user_id);
     sessionStorage.setItem('chatToken', chat_token);
-    console.log("Chat Token:", chat_token);
+    // console.log("Chat Token:", chat_token);
     // Automatically start user session upon successful login
     if (sessionStorage.getItem('chatToken') && location.pathname === '/chat') {
       console.log("Connecting user...")
@@ -48,7 +49,8 @@ const refreshAccessToken = async () => {
     return accessToken;
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    throw error;
+    // throw error;
+    return <Navigate to="/login" state={{ from: "location" }} />
   }
 };
 

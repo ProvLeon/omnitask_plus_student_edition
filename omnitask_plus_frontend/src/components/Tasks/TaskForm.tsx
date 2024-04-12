@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Input, Modal, List, Avatar, Tag, Space } from 'antd';
+import { Button, Typography, Input, Avatar, Tag, Space, List } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { createTask } from '../apis/TaskApi'; // Updated import to use TaskApi
 import { fileToBase64 } from '../../utils/utils';
 import { getAllUsers } from '../apis/UserApi'; // Import the User API call
 import { UploadOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons'; // Importing icons
-import { Box, Dialog, DialogTitle, DialogContent, FormControl, InputLabel, MenuItem, Select, TextField, Grid } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, FormControl, InputLabel, MenuItem, Select, Grid } from '@mui/material';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styled from 'styled-components';

@@ -1,4 +1,3 @@
-import React from 'react'
 
 interface ProgressBarProps {
   startDate: Date;
@@ -7,7 +6,9 @@ interface ProgressBarProps {
   progressCategory: 'todo' | 'in progress' | 'done';
 }
 
+
 const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDate = new Date(), progressCategory }) => {
+
   const calculateProgress = () => {
     const totalDurationDays = (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24);
     const daysUntilEnd = (new Date(endDate).getTime() - new Date(currentDate).getTime()) / (1000 * 3600 * 24);
@@ -33,7 +34,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
 
   const progress = calculateProgress();
   const progressText = `${progress.toPrecision(3)}%`;
-  let progressTextDone = '';
 
   // Update progress bar color based on progress and progress category
   let progressBarColor = 'bg-gray-200'; // Default color
@@ -53,7 +53,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, endDate, currentDa
   }
   if (progressCategory === 'done' && progress < 100) {
     progressBarColor = 'bg-red-400';
-    progressTextDone = 'Done';
   }
 
   return (

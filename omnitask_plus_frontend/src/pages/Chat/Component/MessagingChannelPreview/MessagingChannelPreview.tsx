@@ -70,7 +70,7 @@ const MessagingChannelPreview = (props: MessagingChannelPreviewProps) => {
         setActiveChannel?.(channel);
       }}
     >
-      <AvatarGroup members={members} />
+      <AvatarGroup members={members as ChannelMemberResponse<StreamChatGenerics>[]} />
       <div className='flex flex-col ml-2 mr-2 md:w-full w-auto'>
         <div className='flex gap-5 sm:gap-10 md:gap-auto'>
           <p className=' text-sm font-bold text-black md:flex-grow  truncate'>

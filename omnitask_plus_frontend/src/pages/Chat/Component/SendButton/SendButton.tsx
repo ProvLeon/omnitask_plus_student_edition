@@ -1,5 +1,4 @@
 import { SendIcon } from '../../assets';
-import React from 'react';
 import type { SendButtonProps } from 'stream-chat-react';
 
 const SendButton = ({sendMessage, ...rest}: SendButtonProps) => (

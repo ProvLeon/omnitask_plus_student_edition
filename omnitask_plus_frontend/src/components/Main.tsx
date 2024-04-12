@@ -80,9 +80,9 @@ const Main = () => {
   }, [hasSeenIntro]); // Add hasSeenIntro to the dependency array
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: 'auto' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
-        <div className="logo" />
+        <div className="logo p-8" />
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <Menu.Item key="1" icon={<PieChartOutlined />} onClick={() => console.log('Navigating to Dashboard')}>
             Dashboard
@@ -150,7 +150,7 @@ const Main = () => {
             </Card>
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Omnitask Plus ©2023 Created by LeoTech</Footer>
+        <Footer style={{ textAlign: 'center' }}>Omnitask Plus ©{new Date().getFullYear()} Created by LeoTech-Digital</Footer>
       </Layout>
     </Layout>
   );

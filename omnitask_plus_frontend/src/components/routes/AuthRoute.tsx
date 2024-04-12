@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios'; // Assuming axios is used for HTTP requests
-import { Spin } from 'antd'; // Importing Spin component from Ant Design for loading animation
 import Loading from '../SmallComponents/Loading';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL

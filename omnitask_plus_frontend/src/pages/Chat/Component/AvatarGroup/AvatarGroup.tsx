@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import type { ChannelMemberResponse } from 'stream-chat';
 import { Avatar } from 'stream-chat-react';
 import { getCleanImage } from '../../assets';

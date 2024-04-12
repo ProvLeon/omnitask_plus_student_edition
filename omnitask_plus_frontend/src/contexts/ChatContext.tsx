@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useState, Dispatch, SetStateAction } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { StreamChat } from 'stream-chat';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: string;
-  message: string;
-  timestamp: Date;
-}
+// interface Message {
+//   id: string;
+//   text: string;
+//   sender: string;
+//   message: string;
+//   timestamp: Date;
+// }
 
 // interface ChatContextType {
 //   messages: Message[];

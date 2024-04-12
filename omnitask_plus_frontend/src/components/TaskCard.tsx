@@ -3,7 +3,7 @@ import DropDown from './SmallComponents/DropDown';
 import ProgressBar from './SmallComponents/ProgressBar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { CalendarOutlined, UserOutlined } from '@ant-design/icons'; // Importing Calendar and User icon from Ant Design
+import { CalendarOutlined } from '@ant-design/icons'; // Importing Calendar and User icon from Ant Design
 import { Button, Card, Avatar, Tooltip, Typography, Modal, Input, List, Tag } from 'antd'; // Importing Button, Card, Avatar, Tooltip, Typography, Checkbox, Tag from Ant Design for beautification
 import { updateTaskAttribute } from './apis/TaskApi'; // Import the API call
 import { getAllUsers, getUserData } from './apis/UserApi'; // Import the User API call
