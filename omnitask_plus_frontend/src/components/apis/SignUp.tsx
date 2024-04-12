@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios'; // Add this import
-import { Button, TextField, Box, Grid, Paper, Typography, Container } from '@mui/material';
+import axios, { AxiosError } from 'axios'; // Import axios for making HTTP requests and handling Axios-specific errors
+import { Button, TextField, Box, Grid, Paper, Typography, Container } from '@mui/material'; // Importing Material UI components for UI design
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL; // Base URL for backend API, fetched from environment variables
 
+// Interface to define the structure of error responses from the server
 interface ErrorResponse {
   error: string;
 }
 
-
+// SignUp component for user registration
 const SignUp = () => {
+  // State to hold user details input
   const [userDetails, setUserDetails] = useState({
     username: '',
     password: '',
@@ -19,8 +21,9 @@ const SignUp = () => {
     email: '',
     contact: '',
   });
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to programmatically navigate between routes
 
+  // Function to handle changes in input fields and update state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserDetails(prevState => ({
@@ -29,20 +32,22 @@ const SignUp = () => {
     }));
   };
 
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission behavior
     try {
+      // Attempt to create a new user with the provided details
       await axios.post(`${BASE_URL}/api/users/create`, JSON.stringify(userDetails), {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // Set content type to JSON
         },
       });
       navigate('/login'); // Redirect to login page after successful signup
     } catch (error) {
       if (axios.isAxiosError(error)) { // Check if error is an AxiosError
-        const serverError = error as AxiosError;
+        const serverError = error as AxiosError<ErrorResponse>;
         if (serverError && serverError.response) {
-          const errorResponse = serverError.response.data as ErrorResponse;
+          const errorResponse = serverError.response.data;
           alert(`Failed to sign up. Please check your details:\n\n${errorResponse.error}`);
         }
       } else {
@@ -52,14 +57,15 @@ const SignUp = () => {
     }
   };
 
+  // Render the signup form
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
       <Container maxWidth="lg">
         <Grid container spacing={2} justifyContent="space-between" alignItems="center">
           <Grid item xs={12} md={5} style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-          <Grid item xs={5}>
-            <img src="https://cdn.dribbble.com/users/4241563/screenshots/11874468/media/7796309c77cf752615a3f9062e6a3b3d.gif" alt="Task Management" style={{ width: '100%', maxHeight: '300px', objectFit: 'cover',justifyContent: 'center', marginBottom: '20px' }} />
-          </Grid>
+            <Grid item xs={5}>
+              <img src="https://cdn.dribbble.com/users/4241563/screenshots/11874468/media/7796309c77cf752615a3f9062e6a3b3d.gif" alt="Task Management" style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', justifyContent: 'center', marginBottom: '20px' }} />
+            </Grid>
             <Typography variant="h4" component="h1" gutterBottom>
               Welcome to OmniTask+ (Student Edition)
             </Typography>

@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
+// Importing requestPasswordRecovery function from the RecoverPassword API component
 import { requestPasswordRecovery } from '../components/apis/RecoverPassword';
+// Importing necessary components from Material UI for UI design
 import { Button, TextField, Box, Grid, Paper, Typography, Container } from '@mui/material';
 
+// PassRecoveryPage component for handling password recovery requests
 const PassRecoveryPage = () => {
+  // State for storing user's email and message response
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
+  // Function to handle changes in the email input field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
 
+  // Function to handle form submission for password recovery
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      // Attempting to request password recovery with the provided email
       const response = await requestPasswordRecovery(email);
+      // Setting the response message on success
       setMessage(response.message);
     } catch (error) {
+      // Setting a failure message on error
       setMessage('Failed to request password recovery. Please try again.');
     }
   };
 
+  // Rendering the password recovery page
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
       <Container maxWidth="md">

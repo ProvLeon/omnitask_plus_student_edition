@@ -1,14 +1,15 @@
 import axios from 'axios';
 
+// Base URL for user-related API endpoints, constructed from environment variables
 const BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/users';
 
-// Function to get the authorization token
+// Retrieves the authorization token from session storage
 const getAuthToken = (): string | null => {
   const token = sessionStorage.getItem('accessToken');
   return token;
 };
 
-// Enhanced Axios instance with base configurations
+// Creates an Axios instance with predefined base URL and headers
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -16,7 +17,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Interceptor to add the Authorization token to every request
+// Adds an interceptor to Axios instance to inject the Authorization token into headers of every request
 axiosInstance.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
@@ -27,7 +28,7 @@ axiosInstance.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// API call to fetch user's data by ID
+// Fetches user data by user ID
 const getUserData = async (userId: string): Promise<any> => {
   try {
     const response = await axiosInstance.get(`/getuser/${userId}`);
@@ -37,7 +38,7 @@ const getUserData = async (userId: string): Promise<any> => {
   }
 };
 
-// API call to fetch all users
+// Fetches data for all users
 const getAllUsers = async (): Promise<any> => {
   try {
     const response = await axiosInstance.get(`/getusers`);
@@ -47,20 +48,19 @@ const getAllUsers = async (): Promise<any> => {
   }
 };
 
-// API call to fetch a user by username or email
+// Fetches a user by username or email
 const getUserByUsernameOrEmail = async (username?: string, email?: string): Promise<any> => {
   try {
     const response = await axiosInstance.get('/', {
       params: { username, email },
     });
-    // console.log(response.data)
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-// API call to update user's data
+// Updates user data for a given user ID
 const updateUserData = async (userId: string, userData: any): Promise<any> => {
   try {
     const response = await axiosInstance.put(`/update/${userId}`, {...userData});
@@ -70,34 +70,5 @@ const updateUserData = async (userId: string, userData: any): Promise<any> => {
   }
 };
 
-// // API call to update user's profile image
-// const updateUserImage = async (userId: string, imageBase64: string): Promise<any> => {
-//   try {
-//     const response = await axiosInstance.post(`/update_user_image`, {
-//       user_id: userId,
-//       image: imageBase64,
-//     });
-//     return response.data;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
-// const isUserOnline = async (userId: string): Promise<boolean> => {
-//   // Implementation depends on how your backend determines online status
-//   // This is a placeholder example
-//   try {
-//     const response = await fetch(`/api/users/${userId}/online-status`);
-//     if (!response.ok) {
-//       throw new Error('Network response was not ok');
-//     }
-//     const { online } = await response.json();
-//     return online;
-//   } catch (error) {
-//     console.error('Failed to fetch user online status:', error);
-//     return false;
-//   }
-// };
-
-export {  getUserData, getAllUsers, getUserByUsernameOrEmail, updateUserData };
+export { getUserData, getAllUsers, getUserByUsernameOrEmail, updateUserData };
 

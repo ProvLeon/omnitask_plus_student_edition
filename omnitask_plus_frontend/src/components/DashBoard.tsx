@@ -1,6 +1,9 @@
 import  { useState, useEffect } from 'react';
-import { Layout, Menu, Breadcrumb, Card, message, Modal, Row, Col } from 'antd'; // Import Row and Col for grid layout
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate and useLocation for handling routes
+// Importing necessary UI components from antd library
+import { Layout, Menu, Breadcrumb, Card, message, Modal, Row, Col } from 'antd';
+// Importing hooks for navigation and location from react-router-dom
+import { useNavigate, useLocation } from 'react-router-dom';
+// Importing icons from ant-design for menu items
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -10,35 +13,45 @@ import {
   LineChartOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
+// Importing components from recharts for data visualization
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LineChart, Line, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+// Importing API functions to fetch data for charts
 import { fetchActivitiesTrendsData, fetchProgressTrendsData, fetchPriorityTrendsData } from './apis/TaskApi';
 
+// Destructuring Layout components for easier usage
 const { Header, Content, Footer, Sider } = Layout;
 
+// Main component for the Dashboard
 const Main = () => {
+  // State hooks for managing component state
   const [collapsed, setCollapsed] = useState(false);
   const [activitiesTrendsData, setActivitiesTrendsData] = useState([]);
   const [progressTrendsData, setProgressTrendsData] = useState([]);
   const [priorityTrendsData, setPriorityTrendsData] = useState([]);
+  // State for checking if the intro modal has been seen
   const [hasSeenIntro, setHasSeenIntro] = useState(() => {
     const item = window.sessionStorage.getItem('hasSeenIntro');
     return item ? true : false;
   });
 
-  const navigate = useNavigate(); // Hook for programmatically navigating
-  const location = useLocation(); // Hook for accessing the current location
+  // Hooks for navigation and location
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // Function to handle sidebar collapse
   const onCollapse = (collapsed: boolean): void => {
     console.log(collapsed);
     setCollapsed(collapsed);
   };
 
+  // Effect hook to fetch data and handle resize events
   useEffect(() => {
-
+    // Async function to fetch data for charts
     const getTrendsData = async () => {
       const activitiesData = await fetchActivitiesTrendsData();
       const progressData = await fetchProgressTrendsData();
       const priorityData = await fetchPriorityTrendsData();
+      // Mapping activities data for the bar chart
       if (activitiesData ) {
         setActivitiesTrendsData(activitiesData.map((data: { month: string; total_tasks: number; tasks_done: number }) => ({
           ...data,
@@ -50,6 +63,7 @@ const Main = () => {
       } else {
         setActivitiesTrendsData([]);
       }
+      // Setting state for progress and priority data
       if (progressData) {
         setProgressTrendsData(progressData);
       } else {
@@ -64,12 +78,14 @@ const Main = () => {
 
     getTrendsData();
 
+    // Function to log window resize events
     const handleResize = () => {
       console.log('Resized to: ', window.innerWidth, 'x', window.innerHeight);
     };
 
     window.addEventListener('resize', handleResize);
 
+    // Displaying loading message and intro modal if not seen
     message.loading({ content: 'Loading dashboard...', duration: 2.5 })
       .then(() => message.success({ content: 'Welcome to Omnitask Plus!', duration: 2.5 }), () => {})
       .then(() => {
@@ -97,13 +113,14 @@ const Main = () => {
         }
       });
 
+    // Cleanup function to remove event listener
     return () => window.removeEventListener('resize', handleResize);
   }, [hasSeenIntro]);
 
-  // Define colors for priority categories
+  // Define colors for priority categories in the pie chart
   const COLORS = ['#FF8042', '#FFBB28', '#00C49F'];
 
-  // Function to handle navigation and breadcrumb update
+  // Function to handle navigation based on menu click
   const handleMenuClick = (e: any) => {
     const key = e.key;
     const routeMap = {
@@ -115,13 +132,14 @@ const Main = () => {
     navigate(routeMap[key as keyof typeof routeMap]);
   };
 
-  // Generate breadcrumb items from the current path
+  // Generating breadcrumb items from the current path
   const pathSnippets = location.pathname.split('/').filter(i => i);
   const breadcrumbItems = pathSnippets.map((snippet, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
     return { breadcrumbName: snippet.charAt(0).toUpperCase() + snippet.slice(1), path: url };
   });
 
+  // Main render method
   return (
     <Layout style={{ minHeight: 'auto' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
@@ -218,9 +236,3 @@ const Main = () => {
 }
 
 export default Main;
-// }
-
-// export default Main;
-
-
-

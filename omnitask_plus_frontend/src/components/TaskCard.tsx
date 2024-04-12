@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import DropDown from './SmallComponents/DropDown';
-import ProgressBar from './SmallComponents/ProgressBar';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { CalendarOutlined } from '@ant-design/icons'; // Importing Calendar and User icon from Ant Design
-import { Button, Card, Avatar, Tooltip, Typography, Modal, Input, List, Tag } from 'antd'; // Importing Button, Card, Avatar, Tooltip, Typography, Checkbox, Tag from Ant Design for beautification
-import { updateTaskAttribute } from './apis/TaskApi'; // Import the API call
-import { getAllUsers, getUserData } from './apis/UserApi'; // Import the User API call
+import DropDown from './SmallComponents/DropDown'; // Importing custom DropDown component
+import ProgressBar from './SmallComponents/ProgressBar'; // Importing custom ProgressBar component
+import DatePicker from 'react-datepicker'; // Importing DatePicker component for date selection
+import 'react-datepicker/dist/react-datepicker.css'; // Importing DatePicker styles
+import { CalendarOutlined } from '@ant-design/icons'; // Importing Calendar icon from Ant Design
+import { Button, Card, Avatar, Tooltip, Typography, Modal, Input, List, Tag } from 'antd'; // Importing various components from Ant Design for UI
+import { updateTaskAttribute } from './apis/TaskApi'; // Importing API call to update task attributes
+import { getAllUsers, getUserData } from './apis/UserApi'; // Importing User API calls
 
+// Defining Person interface for type safety
 interface Person {
   id: string;
   image: string;
@@ -15,18 +16,21 @@ interface Person {
   email: string;
 }
 
+// Defining TaskCardProps interface for type safety
 interface TaskCardProps {
-  id: string; // Added id for unique key
+  id: string; // Unique identifier for each task
   title: string;
   description: string;
   priority: "high" | "medium" | "low";
   startDate: Date;
   endDate: Date;
-  personsResponsible?: Person[]; // Changed to support multiple persons
+  personsResponsible?: Person[]; // Optional array of persons responsible for the task
   progressCategory: 'todo' | 'in progress' | 'done';
 }
 
+// TaskCard functional component
 const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, startDate, endDate, personsResponsible, progressCategory }) => {
+  // State hooks for various component states
   const [selectedPriority, setSelectedPriority] = useState(priority);
   const [selectedEndDate, setSelectedEndDate] = useState(endDate);
   const [selectedStartDate, setSelectedStartDate] = useState(startDate);
@@ -40,11 +44,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
   const [allUsers, setAllUsers] = useState<Person[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<Person[]>([]);
 
+  // Effect hook to log selected users
   useEffect(() => {
-    setSelectedPriority(priority);
     console.log(selectedUsers)
-  }, [priority]);
+  }, [selectedUsers]);
 
+  // Effect hook to handle clicks outside the date picker to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (startDatePickerRef.current && !startDatePickerRef.current.contains(event.target as Node)) {
@@ -59,6 +64,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Effect hook to fetch all users and set selected users if any
   useEffect(() => {
     const fetchAllUsers = async () => {
       const users = await getAllUsers();
@@ -72,12 +78,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     fetchAllUsers();
   }, []);
 
+  // Function to handle priority change
   const handlePriorityChange = async (newPriority: string) => {
     const priority: "high" | "medium" | "low" = newPriority as "high" | "medium" | "low";
     setSelectedPriority(priority);
     await updateTaskAttribute(id, 'priority', priority.toLowerCase()); // Update priority in the backend
   };
 
+  // Function to handle start date change
   const handleStartDateChange = async (date: Date | null) => {
     if (date) {
       setSelectedStartDate(date);
@@ -85,6 +93,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     }
   };
 
+  // Function to handle end date change
   const handleEndDateChange = async (date: Date | null) => {
     if (date) {
       setSelectedEndDate(date);
@@ -92,10 +101,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     }
   };
 
+  // Function to toggle start date picker visibility
   const toggleStartDatePicker = () => {
     setIsStartDatePickerOpen(!isStartDatePickerOpen);
   };
 
+  // Function to toggle end date picker visibility
   const toggleEndDatePicker = () => {
     setIsEndDatePickerOpen(!isEndDatePickerOpen);
   };
@@ -111,11 +122,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     return parsedDate.toLocaleDateString('en-US', options);
   }
 
+  // Array to hold date details for rendering
   const dateDetails: { date: Date, color: string, text: string, toggleDatePicker: () => void }[] = [
     { date: selectedStartDate, color: 'green', text: 'Start Date', toggleDatePicker: toggleStartDatePicker },
     { date: selectedEndDate, color: 'red', text: 'End Date', toggleDatePicker: toggleEndDatePicker },
   ]
 
+  // Function to handle user search
   const handleSearchForUser = useCallback(async (query: string) => {
     setSearchQuery(query); // Update search query state
     if (query.length > 2) { // Only search if the query length is more than 2 characters
@@ -129,6 +142,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     }
   }, [allUsers]);
 
+  // Effect hook to debounce user search
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery) {
@@ -141,6 +155,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, handleSearchForUser, allUsers]);
 
+  // Function to handle tag click for user selection
   const handleTagClick = (user: Person) => {
     if (selectedUsers.some(selectedUser => selectedUser.id === user.id)) {
       setSelectedUsers(selectedUsers.filter(selectedUser => selectedUser.id !== user.id));
@@ -149,15 +164,18 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
     }
   };
 
+  // Function to handle modal OK action
   const handleModalOk = async () => {
     await updateTaskAttribute(id, 'persons_responsible', selectedUsers.map(user => user.id)); // Update persons_responsible in the backend
     setIsUserSearchModalVisible(false); // Close the modal after selection
   };
 
+  // Function to toggle user search modal visibility
   const toggleUserSearchModal = () => {
     setIsUserSearchModalVisible(!isUserSearchModalVisible);
   };
 
+  // Rendering TaskCard component
   return (
     <div className='hover:shadow-xl hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer shadow-md flex flex-col bg-white rounded-lg p-4 w-full md:w-[300px] gap-2 relative transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-95' >
       <div id='vertical' className='absolute top-0 left-0 dark:bg-blue-900 bg-blue-500 w-1 h-full rounded-l-full'></div>
@@ -185,6 +203,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ id, title, description, priority, s
         ))}
       </div>
 
+      {/* Date Pickers */}
       {isStartDatePickerOpen && (
         <div className="absolute top-full z-10" ref={startDatePickerRef}>
           <DatePicker

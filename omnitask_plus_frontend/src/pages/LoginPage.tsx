@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../components/apis/LoginApi';
+// Importing necessary components from Material UI for styling and layout
 import { Button, TextField, Box, Grid, Paper, Typography, IconButton, InputAdornment, Container } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material'; // Icons for showing/hiding password
 
+// LoginPage component definition
 const LoginPage = () => {
+  // State for storing user credentials and password visibility
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
 
+  // Function to handle changes in input fields and update state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCredentials(prevState => ({
@@ -17,20 +21,23 @@ const LoginPage = () => {
     }));
   };
 
+  // Function to toggle password visibility
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await loginUser(credentials);
-      navigate('/main'); // Redirect to boards page after successful login
+      await loginUser(credentials); // Attempt to log in with provided credentials
+      navigate('/main'); // Redirect to main page upon successful login
     } catch (error) {
-      alert('Failed to login. Please check your credentials.');
+      alert('Failed to login. Please check your credentials.'); // Alert user on login failure
     }
   };
 
+  // Rendering the login page layout
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" sx={{ background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)' }}>
       <Container maxWidth="lg">

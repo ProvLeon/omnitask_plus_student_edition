@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { fileToBase64 } from '../../utils/utils'; // Assuming TaskApi.tsx is in the apis folder
+// Utility function for converting files to Base64
+import { fileToBase64 } from '../../utils/utils';
+// Material UI components for UI design
 import { TextField, Button, Paper, Avatar, Box, Container, Typography, IconButton, Grid } from '@mui/material';
+// Styled component from Material UI for custom styling
 import { styled } from '@mui/material/styles';
+// Theme interface from Material UI for theming support
 import { Theme } from '@mui/material/styles';
+// Icons from Material UI for edit and camera functionality
 import EditIcon from '@mui/icons-material/Edit';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import { publish } from '../../utils/pubSub'; // Adjust the path as necessary
+// Publish-subscribe utility for component communication
+import { publish } from '../../utils/pubSub';
+// API functions for fetching and updating user data
 import { getUserData, updateUserData } from '../apis/UserApi';
 
-
+// Custom styled component for the profile container
 const Item = styled(Paper)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -18,7 +25,9 @@ const Item = styled(Paper)(({ theme }: { theme: Theme }) => ({
   boxShadow: theme.shadows[5],
 }));
 
+// Profile component for displaying and editing user profile information
 const Profile = () => {
+  // State for storing profile data
   const [profileData, setProfileData] = useState<{
     [key: string]: string;
   }>({
@@ -30,9 +39,12 @@ const Profile = () => {
     contact: '',
     image: '',
   });
+  // State for toggling edit mode
   const [isEditing, setIsEditing] = useState(false);
+  // Retrieve the user ID from session storage
   const userId = sessionStorage.getItem('userId');
 
+  // Fetch profile data on component mount
   useEffect(() => {
     const fetchProfile = async () => {
       if (!userId) return;
@@ -48,11 +60,13 @@ const Profile = () => {
     fetchProfile();
   }, [userId]);
 
+  // Handler for input changes to update profile data state
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfileData({ ...profileData, [name]: value });
   };
 
+  // Handler for file input changes to update profile image
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && userId) {
       const file = e.target.files[0];
@@ -62,16 +76,14 @@ const Profile = () => {
       }
       const base64 = await fileToBase64(file);
       try {
-        // await updateUserData(userId, base64);
         setProfileData({ ...profileData, image: base64 });
-        // alert('Profile image updated successfully');
-        // publish('profileUpdate', { ...profileData, image: base64 }); // Publishing the update
       } catch (error) {
         console.error('Error updating profile image:', error);
       }
     }
   };
 
+  // Handler for submitting updated profile data
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userId) return;
@@ -81,14 +93,16 @@ const Profile = () => {
       await updateUserData(userId, updatedData);
       alert('Profile updated successfully');
       setIsEditing(false);
-      publish('profileUpdate', updatedData); // Publishing the update
+      publish('profileUpdate', updatedData); // Publishing the update for other components
     } catch (error) {
       console.error('Error updating profile:', error);
     }
   };
 
+  // Fields to display in the profile view
   const displayFields = ['username', 'firstname', 'middlename', 'lastname', 'email', 'contact'];
 
+  // Render the profile component
   return (
     <Container maxWidth="md">
       <Item elevation={3}>
@@ -151,4 +165,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
