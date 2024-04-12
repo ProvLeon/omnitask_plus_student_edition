@@ -48,7 +48,7 @@ const SignUp = () => {
       } else {
         alert('Failed to sign up due to an unexpected error. Please try again.');
       }
-      console.log(error);
+      // console.log(error);
     }
   };
 
