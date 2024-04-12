@@ -221,7 +221,7 @@ const CreateChannel = (props: Props) => {
                 ref={inputRef}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={!selectedUsers.length ? 'Start typing for suggestions' : ''}
+                placeholder={!selectedUsers.length ? 'Start Typing User Name for Suggestions' : ''}
                 type='text'
                 className='bg-transparent outline-none w-full'
               />
