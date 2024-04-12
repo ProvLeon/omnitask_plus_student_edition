@@ -37,7 +37,7 @@ def base64_to_bytes(image_base64_string):
 
 def base64_to_file(base64_string, file_name):
     # check if base64 string contains BASE_URL
-    BASE_URL = current_app.config['BASE_URL']
+    BASE_URL = current_app.config['BACKEND_URL']
     if BASE_URL in base64_string:
         return base64_string
     # Decode the base64 string to get the MIME type and data
@@ -70,7 +70,7 @@ def base64_to_file(base64_string, file_name):
         file.write(data)
 
     # Assuming the server is configured to serve files from 'uploads/' at '/uploads/'
-    BASE_URL = current_app.config['BASE_URL']
+    # BASE_URL = current_app.config['BACKEND_URL']
     return f'{BASE_URL}/api/files/{os.path.relpath(file_path, start="uploads/")}'
 
 
