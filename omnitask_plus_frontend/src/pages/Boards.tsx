@@ -1,22 +1,17 @@
 import  { useEffect, useState } from 'react';
-import { getTasks, updateTaskStatus } from '../components/apis/TaskApi'; // Updated import to use updateTaskStatus
-import TaskCard from '../components/TaskCard';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Empty } from 'antd'; // Importing ant design Empty component
+import { getTasks, updateTaskStatus } from '../components/apis/TaskApi'; // Importing task-related API functions
+import TaskCard from '../components/TaskCard'; // Importing the TaskCard component
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'; // Importing drag and drop components
+import { Empty } from 'antd'; // Importing ant design Empty component for empty state UI
 
+// Defining the structure of a board frame, which includes an id, title, and an array of tasks
 interface BoardFrame {
   id: string;
   title: string;
   tasks: Task[];
 }
 
-// interface PersonResponsible  {
-//   id: string;
-//   image: string;
-//   email: string;
-//   username: string;
-//   [key: string ]: any;
-// };
+// Defining the structure of a task with various properties including id, title, description, priority, dates, status, and responsible persons
 interface Task {
   id: string;
   title: string;
@@ -28,20 +23,21 @@ interface Task {
   persons_responsible: []
 }
 
-
+// Main functional component for the Boards page
 const Boards = () => {
-  const [boardFrames, setBoardFrames] = useState<BoardFrame[]>([]);
+  const [boardFrames, setBoardFrames] = useState<BoardFrame[]>([]); // State to hold the board frames
 
+  // Fetch tasks from the API and categorize them into board frames on component mount
   useEffect(() => {
     const fetchTasks = async () => {
-      const tasks = await getTasks();
-
-      categorizeTasks(tasks);
-      console.log(tasks)
+      const tasks = await getTasks(); // Fetching tasks
+      categorizeTasks(tasks); // Categorizing tasks into frames
+      console.log(tasks); // Logging tasks for debugging
     };
     fetchTasks();
   }, []);
 
+  // Function to categorize tasks into 'To Do', 'In Progress', and 'Done' categories
   const categorizeTasks = (tasks: Task[]) => {
     const categories: Record<string, Task[]> = {
       'To Do': [],
@@ -49,6 +45,7 @@ const Boards = () => {
       'Done': [],
     };
 
+    // Sorting tasks into their respective categories based on their status
     tasks.forEach((task: Task) => {
       if (task.status === 'todo') {
         categories['To Do'].push(task);
@@ -59,40 +56,37 @@ const Boards = () => {
       }
     });
 
+    // Creating board frames from the categorized tasks
     const frames: BoardFrame[] = [
       { id: 'todo', title: 'To Do', tasks: categories['To Do'] },
       { id: 'in-progress', title: 'In Progress', tasks: categories['In Progress'] },
       { id: 'done', title: 'Done', tasks: categories['Done'] },
     ];
 
-    setBoardFrames(frames);
+    setBoardFrames(frames); // Updating the state with the new board frames
   };
 
+  // Function to map a task's status to its corresponding category
   const getStatusCategory = (status: string): "todo" | "in progress" | "done" => {
     if (status === 'todo') return "todo";
     if (status === 'in progress') return "in progress";
     return "done";
   };
 
+  // Handler for when a task is dragged and dropped
   const onDragEnd = async (result: any) => {
     const { destination, source, draggableId } = result;
 
-    if (!destination) {
+    // Do nothing if the task is dropped outside a droppable area or dropped in the same place
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
       return;
     }
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
+    const start = boardFrames.find(frame => frame.id === source.droppableId); // Finding the start frame
+    const finish = boardFrames.find(frame => frame.id === destination.droppableId); // Finding the destination frame
 
-    const start = boardFrames.find(frame => frame.id === source.droppableId);
-    const finish = boardFrames.find(frame => frame.id === destination.droppableId);
-
+    // Do nothing if the task is moved within the same frame
     if (start === finish) {
-      // If the task is moved within the same frame, no need to update the database
       return;
     }
 
@@ -100,7 +94,7 @@ const Boards = () => {
     const task = start?.tasks.find(task => task.id === draggableId);
 
     if (task) {
-      // Update the task's progress based on the destination frame
+      // Determine the new status based on the destination frame
       let updatedStatus = 'todo'; // Default to 'To Do'
       if (destination.droppableId === 'in-progress') {
         updatedStatus = 'in progress'; // Arbitrary value representing 'In Progress'
@@ -109,18 +103,17 @@ const Boards = () => {
       }
 
       try {
-        await updateTaskStatus(task.id, updatedStatus);
-        // Fetch tasks again to refresh the UI
-        const tasks = await getTasks();
-        categorizeTasks(tasks);
+        await updateTaskStatus(task.id, updatedStatus); // Updating the task's status in the database
+        const tasks = await getTasks(); // Fetching updated tasks
+        categorizeTasks(tasks); // Recategorizing tasks
       } catch (error) {
-        console.error('Failed to update task status:', error);
+        console.error('Failed to update task status:', error); // Logging error
       }
     }
   };
 
+  // Rendering the board frames and tasks using drag and drop context
   return (
-
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="text-center mb-6 mt-3">
           <h2 className="text-3xl font-bold mb-2">Task Management Board</h2>
@@ -162,12 +155,9 @@ const Boards = () => {
                       </Draggable>
                     ))
                   ) : (
-                    <Empty description="No tasks created yet" />
+                    <Empty description="No tasks created yet" /> // Displaying an empty state if there are no tasks
                     )}
                   {provided.placeholder}
-                    {/* {index === boardFrames.length - 1 && frame.tasks.length === 0 && (
-
-                    )} */}
                 </div>
               </div>
             )}

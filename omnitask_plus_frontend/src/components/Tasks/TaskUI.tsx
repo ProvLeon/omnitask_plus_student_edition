@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
+// Importing necessary components from MUI for UI design
 import { Button, Modal, Box, IconButton, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent, TableSortLabel } from '@mui/material';
-import TaskForm from './TaskForm';
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { getTasks, deleteTask } from '../apis/TaskApi';
-import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
-import { returnUserAvatars } from '../../utils/utils';
-import { Empty } from 'antd'; // Importing ant design Empty component for beautiful no tasks animation
+import TaskForm from './TaskForm'; // Importing the TaskForm component
+import CloseIcon from '@mui/icons-material/Close'; // Importing Close icon for modal
+import DeleteIcon from '@mui/icons-material/Delete'; // Importing Delete icon for delete button
+import { getTasks, deleteTask } from '../apis/TaskApi'; // Importing API functions for tasks
+import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer'; // Importing DocViewer for media preview
+import { returnUserAvatars } from '../../utils/utils'; // Importing utility function for fetching user avatars
+import { Empty } from 'antd'; // Importing ant design Empty component for no tasks animation
 
+// Task interface to define the structure of a task object
 interface Task {
   id: number;
   title: string;
@@ -20,8 +22,10 @@ interface Task {
   persons_responsible: [];
 }
 
+// Priority levels mapping for sorting tasks by priority
 const priorityLevels = { 'high': 1, 'medium': 2, 'low': 3 };
 
+// Function to format date strings into a more readable format
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -29,6 +33,7 @@ const formatDate = (dateString: string) => {
 };
 
 const TaskUI = () => {
+  // State hooks for various component states
   const [open, setOpen] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<string | undefined>(undefined);
@@ -40,6 +45,7 @@ const TaskUI = () => {
   const isExtraSmall = useMediaQuery('(max-width:740px)');
   const [avatars, setAvatars] = useState<{ [key: number]: JSX.Element }>({});
 
+  // Effect hook to fetch tasks on component mount
   useEffect(() => {
     const fetchTasks = async () => {
       let tasksData = await getTasks();
@@ -49,6 +55,7 @@ const TaskUI = () => {
     fetchTasks();
   }, []);
 
+  // Effect hook to fetch avatars for the persons responsible for each task
   useEffect(() => {
     const fetchAvatars = async () => {
       const avatarsMapping: { [key: number]: JSX.Element } = {};
@@ -63,12 +70,14 @@ const TaskUI = () => {
     }
   }, [tasks]);
 
+  // Function to handle sorting requests
   const handleRequestSort = (property: keyof Task) => {
     const isAsc = orderBy === property && orderDirection === 'asc';
     setOrderDirection(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
+  // Memoized value to sort tasks based on selected order and direction
   const sortedTasks = useMemo(() => {
     return tasks.sort((a, b) => {
       let comparison = 0;
@@ -87,20 +96,24 @@ const TaskUI = () => {
     });
   }, [tasks, orderBy, orderDirection]);
 
+  // Functions to handle modal open/close actions
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  // Functions to handle media preview modal open/close actions
   const handleMediaOpen = (mediaUrl: string) => {
     setSelectedMedia(mediaUrl);
     setMediaOpen(true);
   };
   const handleMediaClose = () => setMediaOpen(false);
 
+  // Function to handle task deletion
   const handleDeleteTask = async (taskId: number) => {
     await deleteTask(taskId.toString());
     setTasks(tasks.filter(task => task.id !== taskId));
   };
 
+  // Style object for modal positioning and styling
   const modalStyle = {
     position: 'absolute',
     top: '50%',
@@ -115,12 +128,15 @@ const TaskUI = () => {
     borderRadius: '10px',
   };
 
+  // Function to check if a URL points to an image file
   const isImage = (url: string) => {
     return /\.(jpg|jpeg|png|gif|bmp)$/i.test(url);
   };
 
+  // Responsive font size based on screen width
   const fontSizeResponsive = isMobile ? '0.7rem' : isExtraSmall ? '0.75rem' : '0.8rem';
 
+  // Function to render the task creation form within a modal
   const taskForm = () => {
     return (
       <Modal
@@ -148,7 +164,7 @@ const TaskUI = () => {
     )
   }
 
-
+  // Main component return, rendering either a message for no tasks or the tasks table
   return (
     <div className='w-full md:auto rounded-sm'>
       {tasks.length === 0 ? (
@@ -275,4 +291,3 @@ const TaskUI = () => {
 }
 
 export default TaskUI
-

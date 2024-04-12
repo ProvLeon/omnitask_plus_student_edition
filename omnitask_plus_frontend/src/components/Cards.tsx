@@ -1,4 +1,5 @@
 import * as React from 'react';
+// Importing necessary components and styles from MUI
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -9,11 +10,13 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { LinearProgress, Select, MenuItem, Avatar } from '@mui/material';
+// Importing icons from MUI
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { red } from '@mui/material/colors';
 
+// Interface for CardProps to type-check the props passed to the Cards component
 interface CardProps {
   title: string;
   description: string;
@@ -24,11 +27,13 @@ interface CardProps {
   personResponsible: { name: string; image: string };
 }
 
+// Interface for ExpandMoreProps to type-check the props passed to the ExpandMore component
 interface ExpandMoreProps {
   expand: boolean;
   [key: string]: any; // This allows for other props without explicitly defining them
 }
 
+// Styled component for the expand button with rotation animation
 const ExpandMore = styled((props: ExpandMoreProps) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -40,6 +45,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
+// Cards component definition
 const Cards = ({
   title,
   description,
@@ -49,10 +55,12 @@ const Cards = ({
   image,
   personResponsible,
 }: CardProps) => {
-  const [expanded, setExpanded] = React.useState(false);
-  const [priority, setPriority] = React.useState<string>(initialPriority);
+  const [expanded, setExpanded] = React.useState(false); // State for managing card expansion
+  const [priority, setPriority] = React.useState<string>(initialPriority); // State for managing task priority
+  // State for managing theme (light/dark)
   const [theme, setTheme] = React.useState(localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
 
+  // Effect hook to listen for theme changes in localStorage
   React.useEffect(() => {
     const handleThemeChange = () => {
       const updatedColorScheme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
@@ -67,20 +75,22 @@ const Cards = ({
     };
   }, []);
 
+  // Function to toggle card expansion
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  // Rendering the card component with conditional styling based on the theme
   return (
     <Card sx={{ maxWidth: 300, background: theme === 'dark' ? '#101010' : 'white', color: theme === 'dark' ? 'white' : 'black' }}>
       <CardHeader
         title={title}
         subheader={date.toLocaleDateString()}
         action={
+          // Priority selector dropdown
           <Select
             sx={{ border: 'none', borderRadius: 50, width: 82, height: 20, fontSize: '10px' }}
             className={`  ${priority === 'High' ? 'bg-red-500' : priority === 'Medium' ? 'bg-yellow-500' : priority === 'Low' ? 'bg-green-500' : theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-300'}`}
-            // native
             value={priority}
             onChange={(e) => {
               setPriority(e.target.value as string);

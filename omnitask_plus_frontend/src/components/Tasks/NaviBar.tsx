@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef, Fragment } from 'react';
+// Importing necessary components and hooks from MUI and antd for UI design
 import { IconButton, Menu, MenuItem, useMediaQuery, useTheme, Dialog, DialogTitle, List, ListItem, ListItemText, ListItemAvatar, Avatar as MuiAvatar } from '@mui/material';
 import { Menu as MenuIcon, NotificationsOutlined, Close } from '@mui/icons-material';
+// Importing custom components and utility functions
 import Profile from '../SmallComponents/Profile';
 import { getUserData } from '../apis/UserApi';
 import { subscribe } from '../../utils/pubSub';
@@ -11,6 +13,7 @@ import { Avatar } from 'antd';
 import { DefaultStreamChatGenerics, useChatContext } from 'stream-chat-react';
 import { Event } from 'stream-chat';
 
+// Interfaces for typing the data structures used in the component
 interface ProfileData {
   username: string;
   image: string;
@@ -39,6 +42,7 @@ interface ExtendedMessageEvent {
 }
 
 const NaviBar = () => {
+  // State hooks for managing component state
   const [showProfile, setShowProfile] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -47,15 +51,18 @@ const NaviBar = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showMessages, setShowMessages] = useState(false);
 
+  // State for storing user profile data
   const [profileData, setProfileData] = useState({
     username: '',
     image: '',
   });
 
+  // Using Stream Chat context for real-time chat functionality
   const { client } = useChatContext();
   const user = client.user;
   const navigate = useNavigate();
 
+  // Fetch user profile data on component mount
   useEffect(() => {
     const fetchProfile = async () => {
       const userId = sessionStorage.getItem('userId');
@@ -71,6 +78,7 @@ const NaviBar = () => {
     fetchProfile();
   }, []);
 
+  // Subscribe to profile updates
   useEffect(() => {
     const unsubscribe = subscribe('profileUpdate', (updatedProfileData: ProfileData) => {
       setProfileData(updatedProfileData);
@@ -78,6 +86,7 @@ const NaviBar = () => {
     return () => unsubscribe();
   }, []);
 
+  // Effect for handling scroll behavior to apply sticky navigation bar styling
   useEffect(() => {
     const handleScroll = () => {
       const header = document.querySelector('header');
@@ -90,7 +99,6 @@ const NaviBar = () => {
           header.classList.remove('fixed', 'top-2', 'left-[15%]', 'w-[70%]', 'z-50', 'backdrop-filter', 'backdrop-blur-lg', 'shadow-lg', 'rounded-lg', 'border', 'border-gray-200', 'px-4');
           setScrolled(false);
         }
-
       }
     };
 
@@ -99,6 +107,7 @@ const NaviBar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Effect for handling new messages via Stream Chat
   useEffect(() => {
     const messageHandler = (event: Event<DefaultStreamChatGenerics>) => {
       const extendedEvent = event as unknown as ExtendedMessageEvent; // Type assertion
@@ -131,8 +140,8 @@ const NaviBar = () => {
     };
   }, [client, user?.id]);
 
+  // Handlers for various UI interactions
   const handleProfileClick = () => {
-    // if (!user) return; // Add this line to guard against undefined user
     setShowProfile(!showProfile);
     document.body.style.overflow = showProfile ? 'auto' : 'hidden';
   };
@@ -161,9 +170,11 @@ const NaviBar = () => {
     setShowMessages(false);
   };
 
+  // Utilizing MUI hooks for responsive design
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Rendering components for mobile menu, notifications, and messages dialog
   const renderMobileMenu = (
     <Menu anchorEl={mobileMenuAnchorEl} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} id="primary-search-account-menu-mobile" keepMounted transformOrigin={{ vertical: 'top', horizontal: 'right' }} open={isMobileMenuOpen} onClose={handleMobileMenuClose}>
       <MenuItem onClick={handleMobileMenuClose}>
@@ -203,6 +214,7 @@ const NaviBar = () => {
     </Dialog>
   );
 
+  // Main render method for the navigation bar component
   return (
     <Fragment>
       <header className="bg-transparent backdrop-filter backdrop-blur-sm border-b border-gray-400 dark:border-gray-700">
