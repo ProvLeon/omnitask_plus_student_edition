@@ -62,10 +62,10 @@ const Profile = () => {
       }
       const base64 = await fileToBase64(file);
       try {
-        await updateUserData(userId, base64);
+        // await updateUserData(userId, base64);
         setProfileData({ ...profileData, image: base64 });
-        alert('Profile image updated successfully');
-        publish('profileUpdate', { ...profileData, image: base64 }); // Publishing the update
+        // alert('Profile image updated successfully');
+        // publish('profileUpdate', { ...profileData, image: base64 }); // Publishing the update
       } catch (error) {
         console.error('Error updating profile image:', error);
       }

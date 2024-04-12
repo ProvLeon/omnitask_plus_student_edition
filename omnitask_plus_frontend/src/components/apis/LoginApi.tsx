@@ -49,8 +49,8 @@ const refreshAccessToken = async () => {
     return accessToken;
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    // throw error;
     return <Navigate to="/login" state={{ from: "location" }} />
+    // throw error;
   }
 };
 
