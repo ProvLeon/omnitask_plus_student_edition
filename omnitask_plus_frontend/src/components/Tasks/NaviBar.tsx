@@ -156,8 +156,8 @@ const NaviBar = () => {
     setShowMessages(true);
   };
 
-  const handleNavigateToChat = (messageId: string) => {
-    navigate(`/chat/${messageId}`);
+  const handleNavigateToChat = () => {
+    navigate(`/chat`);
     setShowMessages(false);
   };
 
@@ -192,7 +192,7 @@ const NaviBar = () => {
       <DialogTitle>Messages</DialogTitle>
       <List>
         {messages.map((message) => (
-          <ListItem button onClick={() => handleNavigateToChat(message.id)} key={message.id}>
+          <ListItem component="div" onClick={() => handleNavigateToChat()} key={message.id}>
             <ListItemAvatar>
               <MuiAvatar src={message.sender.avatar} />
             </ListItemAvatar>

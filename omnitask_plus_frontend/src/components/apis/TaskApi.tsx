@@ -120,5 +120,50 @@ const updateTaskAttribute = async (taskId: string, attribute: string, value: any
   }
 };
 
+// API call to fetch trend data
+const fetchActivitiesTrendsData = async (): Promise<any> => {
+  try {
+    const response = await axiosInstance.get('/activity_trends', {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
-export { getTasks, createTask, updateTask, deleteTask, updateTaskStatus, updateTaskAttribute };
+// API call to fetch progress trends data
+const fetchProgressTrendsData = async (): Promise<any> => {
+  try {
+    const response = await axiosInstance.get('/progress_trends', {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// API call to fetch priority trends data
+const fetchPriorityTrendsData = async (): Promise<any> => {
+  try {
+    const response = await axiosInstance.get('/priority_trends', {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
+    console.log(response)
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getTasks, createTask, updateTask, deleteTask, updateTaskStatus, updateTaskAttribute, fetchActivitiesTrendsData, fetchProgressTrendsData, fetchPriorityTrendsData };
+

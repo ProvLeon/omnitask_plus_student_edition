@@ -9,6 +9,7 @@ import { Dialog, DialogTitle, DialogContent, FormControl, InputLabel, MenuItem, 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import styled from 'styled-components';
+import { format } from 'date-fns'; // Import format from date-fns for date formatting
 
 export interface User {
   id: string;
@@ -20,8 +21,8 @@ export interface User {
 interface TaskData {
   title: string;
   description: string;
-  start_date: Date | null;
-  end_date: Date | null;
+  start_date: Date | string | number;
+  end_date: Date | string | number;
   priority: 'low' | 'medium' | 'high';
   status: 'todo' | 'in progress' | 'done';
   media: File | string | null;
@@ -39,8 +40,8 @@ const TaskForm = () => {
   const [taskData, setTaskData] = useState<TaskData>({
     title: '',
     description: '',
-    start_date: null,
-    end_date: null,
+    start_date: new Date(),
+    end_date: new Date(),
     priority: 'low',
     status: 'todo',
     media: null,
@@ -63,7 +64,9 @@ const TaskForm = () => {
   };
 
   const handleDateChange = (value: Date | null, key: keyof TaskData) => {
-    handleChange(value, key);
+    if (value) {
+      handleChange(format(value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"), key);
+    }
   };
 
   const handleUserSelect = (user: User) => {
@@ -81,16 +84,13 @@ const TaskForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (taskData.media instanceof File) {
-        const base64String = await fileToBase64(taskData.media);
-        const newTaskData: TaskData = { ...taskData, media: base64String };
-        console.log(newTaskData)
-        await createTask(newTaskData);
-        navigate('/tasks');
-      } else {
-        await createTask(taskData);
-        navigate('/tasks');
+      let payload = { ...taskData };
+      if (payload.media instanceof File) {
+        const base64String = await fileToBase64(payload.media);
+        payload = { ...payload, media: base64String };
       }
+      await createTask(payload);
+      navigate('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
     }
@@ -119,7 +119,7 @@ const TaskForm = () => {
 
         <InputLabel className='w-32'>Start Date</InputLabel>
         <StyledDatePicker
-          selected={taskData.start_date}
+          selected={new Date(taskData.start_date)}
           onChange={(date: Date) => handleDateChange(date, 'start_date')}
           dateFormat="MMMM d, yyyy"
           showPopperArrow={false}
@@ -129,7 +129,7 @@ const TaskForm = () => {
         <Grid item xs={6}>
         <InputLabel>End Date</InputLabel>
         <StyledDatePicker
-          selected={taskData.end_date}
+          selected={new Date(taskData.end_date)}
           onChange={(date: Date) => handleDateChange(date, 'end_date')}
           dateFormat="MMMM d, yyyy"
           showPopperArrow={false}

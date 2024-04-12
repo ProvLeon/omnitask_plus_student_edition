@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import Main from './components/Main';
+import Main from './components/DashBoard';
 import Boards from './pages/Boards';
 import Tasks from './pages/Tasks';
 import ChatPage from './pages/ChatPage';

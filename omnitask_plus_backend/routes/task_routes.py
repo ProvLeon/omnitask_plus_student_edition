@@ -5,12 +5,13 @@ from models.user import User  # Import User model to query persons responsible
 from models.base_model import base64_to_file, delete_file, reformat_date, time_format
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
 import uuid
 import os
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func, extract, case
 
 
 bp = Blueprint('task_routes', __name__, url_prefix='/tasks')
@@ -197,4 +198,59 @@ def update_task_attribute(task_id, attribute):
     else:
         return jsonify(error="Task not found"), 404
 
+@bp.route('/priority_trends', methods=['GET'])
+@jwt_required()
+def get_priority_trends():
+    try:
+        # Grouping priority trends as high, medium, and low
+        priority_trends = session.query(
+            Task.priority,
+            func.count(Task.id).label('count')
+        ).group_by(Task.priority).all()
 
+        # Mapping priorities to high, medium, and low
+        priority_mapping = {"high": 0, "medium": 0, "low": 0}
+        for priority, count in priority_trends:
+            if priority in priority_mapping:
+                priority_mapping[priority] += count
+
+        priority_trends_data = [{"priority": key, "count": value} for key, value in priority_mapping.items()]
+        return jsonify(priority_trends_data), 200
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+@bp.route('/activity_trends', methods=['GET'])
+@jwt_required()
+def get_activity_trends():
+    try:
+        twelve_months_ago = datetime.now() - timedelta(days=365)
+        # Query to get the total number of tasks and the number of tasks done per month
+        trends = session.query(
+            extract('month', Task.start_date).label('month'),
+            func.count(Task.id).label('total_tasks'),
+            func.sum(case((Task.status == 'done', 1), else_=0)).label('tasks_done')
+        ).filter(Task.start_date >= twelve_months_ago).group_by('month').all()
+
+        # Preparing the data for response
+        trends_data = [{"month": datetime(1900, month, 1).strftime('%b'), "total_tasks": total_tasks, "tasks_done": tasks_done} for month, total_tasks, tasks_done in trends]
+        return jsonify(trends_data), 200
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+@bp.route('/progress_trends', methods=['GET'])
+@jwt_required()
+def get_progress_trends():
+    try:
+        twelve_months_ago = datetime.now() - timedelta(days=365)
+        progress_trends = session.query(
+            extract('month', Task.start_date).label('month'),
+            func.count(Task.id).label('total'),
+            func.sum(case((Task.status == 'todo', 1), else_=0)).label('todo'),
+            func.sum(case((Task.status == 'in progress', 1), else_=0)).label('in_progress'),
+            func.sum(case((Task.status == 'done', 1), else_=0)).label('done')
+        ).filter(Task.start_date >= twelve_months_ago).group_by('month').all()
+
+        progress_trends_data = [{"month": datetime(1900, month, 1).strftime('%b'), "total": total, "todo": todo, "in_progress": in_progress, "done": done} for month, total, todo, in_progress, done in progress_trends]
+        return jsonify(progress_trends_data), 200
+    except Exception as e:
+        return jsonify(error=str(e)), 500

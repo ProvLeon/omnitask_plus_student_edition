@@ -98,11 +98,13 @@ def reformat_date(date_str, desired_format=time_format):
     for fmt in known_formats:
         try:
             # Try to parse the date string with the current format
-            parsed_date = datetime.strptime(date_str, fmt)
-            # Convert the parsed date to UTC format
-            utc_date = parsed_date.astimezone(timezone.utc)
-            # If parsing and conversion are successful, reformat and return the date in the desired format
-            return utc_date.strftime(desired_format)
+            # parsed_date = datetime.strptime(date_str, fmt)
+            # # Convert the parsed date to UTC format
+            # utc_date = parsed_date.astimezone(timezone.utc)
+            # # If parsing and conversion are successful, reformat and return the date in the desired format
+            # return utc_date.strftime(desired_format)
+            # return datetime.strptime(date_str, fmt).astimezone(timezone.utc).strftime(desired_format)
+            return datetime.strptime(date_str, desired_format)
         except ValueError:
             # If parsing fails, try the next format
             continue
