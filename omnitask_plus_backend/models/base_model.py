@@ -75,7 +75,7 @@ def base64_to_file(base64_string, file_name):
 
 
 def delete_file(media):
-    BASE_URL = current_app.config['BASE_URL']
+    BASE_URL = current_app.config['BACKEND_URL']
     UPLOAD_FOLDER = 'uploads'
     if media:
             media_filename = media.split(f"{BASE_URL}/api/files")[1]  # Extract filename from URL
