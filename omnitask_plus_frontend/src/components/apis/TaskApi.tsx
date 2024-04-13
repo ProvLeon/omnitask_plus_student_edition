@@ -2,7 +2,7 @@ import axios from 'axios';
 import { fileToBase64 } from '../../utils/utils';
 import { User } from '../Tasks/TaskForm';
 
-// Base URL for the backend tasks endpoint
+// Base URL for the backend tasks endpoint.
 const BASE_URL = import.meta.env.VITE_BACKEND_URL + '/tasks';
 
 // Function to retrieve the authentication token from session storage
