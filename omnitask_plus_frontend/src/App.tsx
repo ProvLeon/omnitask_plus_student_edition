@@ -15,9 +15,12 @@ const Layout = () => {
 
   return (
     <>
-      {showHeader && <ErrorBoundary><NaviBar /></ErrorBoundary>} // Show the navigation bar wrapped in an ErrorBoundary if showHeader is true
-      <RoutesComponent /> // Always show the RoutesComponent which contains the application's routes
-      {showFooter && <Footer />} // Show the footer if showFooter is true
+      {/* // Show the navigation bar wrapped in an ErrorBoundary if showHeader is true */}
+      {showHeader && <ErrorBoundary><NaviBar /></ErrorBoundary>}
+      {/* // Always show the RoutesComponent which contains the application's routes */}
+      <RoutesComponent />
+      {/* // Show the footer if showFooter is true */}
+      {showFooter && <Footer />}
     </>
   );
 }
@@ -27,7 +30,8 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white">
-        <Layout /> // Render the Layout component
+         {/* // Render the Layout component */}
+        <Layout />
       </div>
     </Router>
   );

@@ -25,10 +25,12 @@ const NotFoundPage = () => {
         }}
       >
         <Typography variant="h1" component="h2" gutterBottom>
-          404 // Displaying the error code prominently
+          {/* // Displaying the error code prominently */}
+          404
         </Typography>
         <Typography variant="h5" component="p" gutterBottom>
-          Oops! Page not found. // A simple message indicating the page is not found
+          {/* // A simple message indicating the page is not found */}
+          Oops! Page not found.
         </Typography>
       </motion.div>
       <motion.div
@@ -41,7 +43,8 @@ const NotFoundPage = () => {
           onClick={() => navigate('/')} // Navigates the user back to the homepage on click
           sx={{ mt: 3 }} // Adds margin top for spacing
         >
-          Go Back Home // Button text
+          {/* // Button text */}
+          Go Back Home
         </Button>
       </motion.div>
     </Box>
