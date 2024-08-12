@@ -51,8 +51,10 @@ const returnUserAvatars = async (personsResponsible: string[]) => {
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader(); // Create a new FileReader object
-    reader.onload = () => resolve(reader.result as string); // Resolve the promise with the file's result when reading is complete
-    reader.onerror = error => reject(error); // Reject the promise if an error occurs
+    // Resolve the promise with the file's result when reading is complete
+    reader.onload = () => resolve(reader.result as string);
+    // Reject the promise if an error occurs
+    reader.onerror = error => reject(error);
     reader.readAsDataURL(file); // Start reading the file as a Data URL
   });
 };

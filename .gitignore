@@ -186,6 +186,9 @@ omnitask_plus_backend/*.pyc
 
 *.pyc
 
+*.docx
+*.pdf
+*.txt
 
 # PyCharm
 #.idea/
@@ -194,3 +197,4 @@ mvp_specification.docx
 .DS_Store
 
 omnitask_plus_backend/pyvenv.cfg
+.DS_Store

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 // Utility function for converting files to Base64
 import { fileToBase64 } from '../../utils/utils';
 // Material UI components for UI design
-import { TextField, Button, Paper, Avatar, Box, Container, Typography, IconButton, Grid } from '@mui/material';
+import { TextField, Button, Paper, Avatar, Box, Container, Typography, IconButton, Grid, useMediaQuery, useTheme } from '@mui/material';
 // Styled component from Material UI for custom styling
 import { styled } from '@mui/material/styles';
 // Theme interface from Material UI for theming support
@@ -43,6 +43,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   // Retrieve the user ID from session storage
   const userId = sessionStorage.getItem('userId');
+  // Use theme for responsive design
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -104,17 +107,17 @@ const Profile = () => {
 
   // Render the profile component
   return (
-    <Container maxWidth="md">
+    <Container maxWidth={isMobile ? 'xs' : 'md'} sx={{margin: 1, overflow: 'auto'}} >
       <Item elevation={3}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2, }}>
           <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 'medium' }}>
             User Profile
           </Typography>
           <Box sx={{ position: 'relative', display: 'inline-flex', mb: 2 }}>
-            <Avatar src={profileData.image} sx={{ width: 128, height: 128 }} />
+            <Avatar src={profileData.image} sx={{ width: isMobile ? 80 : 100, height: isMobile ? 80 : 100 }} />
             {isEditing && (
               <IconButton
-                sx={{ position: 'absolute', right: -10, bottom: 0, backgroundColor: 'primary.main', '&:hover': { backgroundColor: 'primary.dark' } }}
+                sx={{ position: 'absolute', right: isMobile? 5 : 10, bottom: 0, backgroundColor: 'primary.main', '&:hover': { backgroundColor: 'primary.dark' } }}
                 component="label"
               >
                 <input type="file" hidden onChange={handleFileChange} />
@@ -124,7 +127,7 @@ const Profile = () => {
           </Box>
           {isEditing ? (
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
-              <Grid container spacing={2}>
+              <Grid container spacing={isMobile ? 0 : 2}>
                 {displayFields.map((field) => (
                   <Grid item xs={12} sm={field === 'email' || field === 'contact' ? 12 : 6} key={field}>
                     <TextField
@@ -133,8 +136,9 @@ const Profile = () => {
                       value={profileData[field]}
                       onChange={handleInputChange}
                       variant="outlined"
-                      margin="normal"
+                      margin={isMobile ? 'normal' : undefined}
                       fullWidth
+                      sx={{ ...(isMobile ? {height: 40, padding: 0 } : {})}}
                     />
                   </Grid>
                 ))}
@@ -147,7 +151,7 @@ const Profile = () => {
           ) : (
             <Box sx={{ mt: 1, width: '100%' }}>
               {displayFields.map((field) => (
-                <Typography key={field} sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography key={field} sx={{ mt: 2, textAlign: 'left', width: isMobile ? 200 : 'auto'}}>
                   {`${field.charAt(0).toUpperCase() + field.slice(1)}: ${profileData[field]}`}
                 </Typography>
               ))}

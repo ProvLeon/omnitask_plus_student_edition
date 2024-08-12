@@ -254,11 +254,13 @@ const NaviBar = () => {
         </nav>
       </header>
       {showProfile && <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg z-50">
-          <button onClick={handleCloseProfile} className="absolute top-0 right-0 m-2 text-gray-800 dark:text-white">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg z-50" >
+          <button onClick={handleCloseProfile} className="absolute top-10 right-10 m-2 text-gray-800 dark:text-white" onBlur={() => setShowProfile(false)}>
             <Close />
           </button>
+          {/* <div onBlur={() => handleCloseProfile()}> */}
           <Profile />
+          {/* </div> */}
         </div>
       </div>}
       {renderMessagesDialog}

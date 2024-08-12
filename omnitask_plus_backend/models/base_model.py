@@ -16,9 +16,13 @@ time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 class BaseModel(Base):
     __abstract__ = True
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    id = Column(UUID(as_uuid=True),
+                primary_key=True,
+                default=uuid.uuid4,
+                nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)  # Simplified constructor with super call
@@ -26,7 +30,10 @@ class BaseModel(Base):
         self.updated_at = datetime.utcnow()
 
     def to_dict(self):
-        model_dict = {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+        model_dict = {
+            c.key: getattr(self, c.key)
+        for c in inspect(self).mapper.column_attrs
+        }
         return model_dict
 
 def base64_to_string(image_bytes):

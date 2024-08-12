@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify
+import os
 from stream_chat import StreamChat
 
 stream_chat_bp = Blueprint('stream_chat', __name__)
 
 # Initialize Stream Chat client
-stream_chat_client = StreamChat(api_key='nnkbnhae7pns', api_secret='9aemahbzmrq5v3xvqefumt8zu72r9swdpyvmmvbmh4qv9tevdsj56p577ed35zzu')
+stream_chat_client = StreamChat(
+    api_key=os.getenv('STREAM_CHAT_API_KEY'),
+    api_secret= os.getenv('STREAM_CHAT_SECRETE')
+    )
 
 
 @stream_chat_bp.route('/initiate_private_chat', methods=['POST'])

@@ -15,6 +15,8 @@ app = Flask(__name__)
 
 
 app.config['BACKEND_URL'] = os.getenv('BACKEND_URL')
+app.config['STREAM_CHAT_API_KEY'] = os.getenv('STREAM_CHAT_API_KEY')
+app.config['STREAM_CHAT_SECRETE'] = os.getenv('STREAM_CHAT_SECRETE')
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')

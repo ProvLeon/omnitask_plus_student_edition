@@ -11,7 +11,12 @@ engine = create_engine(
     pool_timeout=300,
     echo=True
     )
-session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+session = scoped_session(
+    sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine)
+        )
 
 Base.query = session.query_property()
 

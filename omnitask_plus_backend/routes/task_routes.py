@@ -214,7 +214,8 @@ def get_priority_trends():
             if priority in priority_mapping:
                 priority_mapping[priority] += count
 
-        priority_trends_data = [{"priority": key, "count": value} for key, value in priority_mapping.items()]
+        priority_trends_data = [{"priority": key, "count": value}
+                                for key, value in priority_mapping.items()]
         return jsonify(priority_trends_data), 200
     except Exception as e:
         return jsonify(error=str(e)), 500
