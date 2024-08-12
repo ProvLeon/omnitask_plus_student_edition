@@ -6,7 +6,7 @@
   "proxy": "http://127.0.0.1:9614",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmitOnError false && vite build",
+    "build": "babel src --out-dir dist --extensions '.ts,.tsx' && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "vite",
@@ -47,6 +47,9 @@
     "use-sound": "^4.0.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/preset-typescript": "^7.24.7",
     "@types/lodash.debounce": "^4.0.9",
     "@types/react": "^18.2.74",
     "@types/react-beautiful-dnd": "^13.1.8",
